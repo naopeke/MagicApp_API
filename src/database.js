@@ -8,6 +8,6 @@ const connection = mysql.createConnection({
     port:       process.env.DB_PORT         || 3306
 })
 
-console.log('Created the connection to the database');
+console.log('Conexión con la BBDD creada');
 
 module.exports = { connection };
