@@ -32,10 +32,19 @@ const editUser = async (req, res, next) => {
     }
 }
 
+const logoutUser = async (req, res, next) => {
+    try {
+        console.log('edit user try');
+    } catch {
+        console.log('edit user catch');
+    }
+}
+
 
 module.exports = {
     registerUser,
     loginUser,
     getUser,
-    editUser
+    editUser,
+    logoutUser
 };

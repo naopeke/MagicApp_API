@@ -10,4 +10,4 @@ const connection = mysql.createConnection({
 
 console.log('Conexión con la BBDD creada');
 
-// module.exports = { connection };
+module.exports = { connection };
