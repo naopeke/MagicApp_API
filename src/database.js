@@ -7,4 +7,3 @@ const connection = mysql.createConnection({
     database:   process.env.DB_NAME         || "magydeck",
     port:       process.env.DB_PORT         || 3306
 })
-
