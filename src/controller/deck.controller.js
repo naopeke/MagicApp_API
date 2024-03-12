@@ -1,6 +1,6 @@
 const { connection } =  require('../database');
 
-const getCards = async (req, res, next) => {
+const getDecks = async (req, res, next) => {
     try {
         console.log('get cards try');
     } catch {
@@ -8,7 +8,7 @@ const getCards = async (req, res, next) => {
     }
 }
 
-const addCards = async (req, res, next) => {
+const editDeck = async (req, res, next) => {
     try {
         console.log('add cards try');
     } catch {
@@ -17,7 +17,7 @@ const addCards = async (req, res, next) => {
 }
 
 
-const deleteCards = async (req, res, next) => {
+const deleteDeck = async (req, res, next) => {
     try {
         console.log('add cards try');
     } catch {
@@ -26,7 +26,7 @@ const deleteCards = async (req, res, next) => {
 }
 
 module.exports = {
-    getCards,
-    addCards,
-    deleteCards
+    getDecks,
+    editDeck,
+    deleteDeck
 };

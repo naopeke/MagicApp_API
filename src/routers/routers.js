@@ -1,11 +1,11 @@
 const { Router } = require ('express');
 const router = Router();
-const bookCtrl = require('../controller/book.controller');
+const userCtrl = require('../controller/user.controller');
+const cardCtrl = require('../controller/card.controller');
+const deckCtrl = require('../controller/deck.controller');
+const eventCtrl = require('../controller/event.controller');
 
-router.get('/', bookCtrl.getBook);
-router.post('/', bookCtrl.postBook);
-router.put('/', bookCtrl.putBook);
-router.delete('/', bookCtrl.deleteBook);
-router.get('*', bookCtrl.errorBook);
+router.get('/', userCtrl.registerUser);
+
 
 module.exports = router;
