@@ -1,7 +1,9 @@
 const { connection } =  require('../database');
+const axios = require('axios');
 
-const getCards = async (req, res, next) => {
+const fetchCardData = async (req, res, next) => {
     try {
+        const response = await axios.get('https://api.scryfall.com/cards/named?fuzzy=aust+com')
         console.log('get cards try');
     } catch {
         console.log('get cards catch');

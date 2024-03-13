@@ -6,11 +6,16 @@ router.get('/eventos', eventCtrl.getAllEvents);
 
 router.get('/eventos/?:id_user', eventCtrl.getMyEvents);
 
+router.get('/eventos/?:id_event', eventCtrl.getMyEvents);
+
 router.get('/eventos/??????', eventCtrl.getOthersEvents);
 
 router.post('/eventos', eventCtrl.addMyEvent);
 
 router.put('/eventos', eventCtrl.editMyEvent);
+
+router.put('/eventos/detalle', eventCtrl.editParticipation);
+//belu
 
 router.delete('/eventos', eventCtrl.deleteMyEvent);
 
@@ -24,4 +29,5 @@ router.delete('/eventos', eventCtrl.deleteMyEvent);
 
 // router.post('/eventos, ) añadir evento con el id_user del logging
 // router.put('/eventos, ) editar evento solo mi id_user de loggin coincide con del creador
+//router.put('/eventos/detalle', eventCtrl.editParticipation);  editar participacion boleano  Belu
 // router.delete('/eventos, ) eliminar evento solo mi id_user de loggin coincide con del creador
