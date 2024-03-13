@@ -15,7 +15,7 @@ const getDecks = async (req, res, next) => {
     }
 }
 
-const addDecks = async (req, res, next) => {
+const addDeck = async (req, res, next) => {
     try {
         console.log('add deck try');
     } catch {
@@ -50,7 +50,8 @@ const shareDeck = async (req, res, next) => {
 
 module.exports = {
     getDecks,
+    addDeck,
+    editDeckName,
     editDeck,
-    deleteCard,
-    deleteAllCards
+    shareDeck
 };
