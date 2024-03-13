@@ -4,8 +4,8 @@ const eventCtrl = require('../controller/event.controller');
 
 // router.get('/event', eventCtrl.getEvent);
 
-// router.post('/event', userCtrl.makeEvent);
+// router.post('/event', eventCtrl.makeEvent);
 
-// router.post('/event', userCtrl.editEvent);
+// router.post('/event', eventCtrl.editEvent);
 
-// router.put('/event', userCtrl.deleteEvent);
+// router.put('/event', eventCtrl.deleteEvent);
