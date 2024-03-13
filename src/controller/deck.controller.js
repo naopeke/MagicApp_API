@@ -17,7 +17,15 @@ const editDeck = async (req, res, next) => {
 }
 
 
-const deleteDeck = async (req, res, next) => {
+const deleteCard = async (req, res, next) => {
+    try {
+        console.log('add cards try');
+    } catch {
+        console.log('add cards catch');
+    }
+}
+
+const deleteAllCards = async (req, res, next) => {
     try {
         console.log('add cards try');
     } catch {
@@ -28,5 +36,6 @@ const deleteDeck = async (req, res, next) => {
 module.exports = {
     getDecks,
     editDeck,
-    deleteDeck
+    deleteCard,
+    deleteAllCards
 };
