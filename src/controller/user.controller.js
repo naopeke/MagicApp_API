@@ -24,7 +24,5 @@ const logoutUser = (req, res, next) => {
 module.exports = {
     registerUser,
     loginUser,
-    getUser,
-    editUser,
     logoutUser
 };
