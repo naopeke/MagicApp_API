@@ -16,28 +16,8 @@ const loginUser = async (req, res, next) => {
     }
 }
 
-const getUser = async (req, res, next) => {
-    try {
-        console.log('get user try');
-    } catch {
-        console.log('get user catch');
-    }
-}
-
-const editUser = async (req, res, next) => {
-    try {
-        console.log('edit user try');
-    } catch {
-        console.log('edit user catch');
-    }
-}
-
-const logoutUser = async (req, res, next) => {
-    try {
-        console.log('edit user try');
-    } catch {
-        console.log('edit user catch');
-    }
+const logoutUser = (req, res, next) => {
+    res.json({ success: true });
 }
 
 

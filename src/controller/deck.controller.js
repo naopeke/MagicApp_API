@@ -7,7 +7,7 @@ const { connection } =  require('../database');
 // router.put('/mis-mazos/compartir', deckCtrl.shareDeck);
 
 
-const getDecks = async (req, res, next) => {
+const getMyDecks = async (req, res, next) => {
     try {
         console.log('get decks try');
     } catch {
@@ -15,7 +15,7 @@ const getDecks = async (req, res, next) => {
     }
 }
 
-const addDeck = async (req, res, next) => {
+const addMyDeck = async (req, res, next) => {
     try {
         console.log('add deck try');
     } catch {
@@ -23,7 +23,7 @@ const addDeck = async (req, res, next) => {
     }
 }
 
-const editDeckName = async (req, res, next) => {
+const editMyDeckName = async (req, res, next) => {
     try {
         console.log('edit deck name try');
     } catch {
@@ -31,7 +31,7 @@ const editDeckName = async (req, res, next) => {
     }
 }
 
-const editDeck = async (req, res, next) => {
+const editMyDeck = async (req, res, next) => {
     try {
         console.log('edit deck try');
     } catch {
@@ -39,7 +39,7 @@ const editDeck = async (req, res, next) => {
     }
 }
 
-const shareDeck = async (req, res, next) => {
+const mySharedDeck = async (req, res, next) => {
     try {
         console.log('share deck try');
     } catch {
@@ -49,9 +49,9 @@ const shareDeck = async (req, res, next) => {
 
 
 module.exports = {
-    getDecks,
-    addDeck,
-    editDeckName,
-    editDeck,
-    shareDeck
+    getMyDecks,
+    addMyDeck,
+    editMyDeckName,
+    editMyDeck,
+    mySharedDeck
 };

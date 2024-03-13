@@ -1,5 +1,34 @@
 const { connection } =  require('../database');
 
+const getSharedDecks = async (req, res, next) => {
+    try {
+        console.log('add cards try');
+    } catch {
+        console.log('add cards catch');
+    }
+}
+
+const getVotedDecks = async (req, res, next) => {
+    try {
+        console.log('add cards try');
+    } catch {
+        console.log('add cards catch');
+    }
+}
+
+const getDeckById = async (req, res, next) => {
+    try {
+        console.log('add cards try');
+    } catch {
+        console.log('add cards catch');
+    }
+}
+
+module.exports = {
+    getSharedDecks,
+    getVotedDecks,
+    getDeckById
+};
 
 
 

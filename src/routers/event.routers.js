@@ -2,17 +2,17 @@ const { Router } = require ('express');
 const router = Router();
 const eventCtrl = require('../controller/event.controller');
 
-// router.get('/eventos', eventCtrl.getAllEvents);
+router.get('/eventos', eventCtrl.getAllEvents);
 
-// router.get('/eventos/?:id_user', eventCtrl.getMyEvents);
+router.get('/eventos/?:id_user', eventCtrl.getMyEvents);
 
-// router.get('/eventos/??????, eventCtrl.getOthersEvents); filtro para que aparece solo los eventos que NO son creados por el usuario
+router.get('/eventos/??????', eventCtrl.getOthersEvents);
 
-// router.post('/eventos', eventCtrl.addMyEvent);
+router.post('/eventos', eventCtrl.addMyEvent);
 
-// router.put('/eventos', eventCtrl.editMyEvent);
+router.put('/eventos', eventCtrl.editMyEvent);
 
-// router.delete('/eventos', eventCtrl.deleteMyEvent);
+router.delete('/eventos', eventCtrl.deleteMyEvent);
 
 
 

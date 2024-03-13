@@ -4,10 +4,17 @@ const userCtrl = require('../controller/user.controller');
 
 
 
-// router.post('/register', userCtrl.registerUser);
+router.post('/register', userCtrl.registerUser);
 
-// router.post('/login', userCtrl.loginUser);
+router.post('/login', userCtrl.loginUser);
 
-// router.put('/profile', userCtrl.editUser);
+
+
+// *NOTE -  Registrar
+// router.post('/register', )
+
+// *NOTE -  Login
+// router.post('/loginUser', )
+
 
 
