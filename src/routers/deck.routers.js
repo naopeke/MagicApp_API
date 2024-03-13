@@ -20,3 +20,5 @@ router.put('/mis-mazos/compartir', deckCtrl.mySharedDeck);
 // router.put('/mis-mazos/nombre, ) editar nombre deck, pasar por body tbn el id_user
 // router.put('/mis-mazos, ) modificar deck, pasar por body tbn el id_user
 // router.put('/mis-mazos/compartir, ) modificar compartir boolean, pasar por body tbn el id_user
+
+module.exports = router;

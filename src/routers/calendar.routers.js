@@ -18,3 +18,5 @@ router.delete('/calendario', calendarCtrl.deleteMyEvent);
   // parametro de la funcion (id_user, Event) por body
 // router.put('/calendario, ) modificar p<rticipacion del evento(pasar participation a false)
 // router.delete('/calendario, ) eliminar evento solo mi id_user de loggin coincide con del creador
+
+module.exports = router;

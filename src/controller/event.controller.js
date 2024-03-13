@@ -40,6 +40,14 @@ const editMyEvent = async (req, res, next) => {
     }
 }
 
+const editParticipation = async (req, res, next) => {
+    try {
+        console.log('get decks try');
+    } catch {
+        console.log('get decks catch');
+    }
+}
+
 const deleteMyEvent = async (req, res, next) => {
     try {
         console.log('get decks try');
@@ -65,5 +73,6 @@ module.exports = {
     getOthersEvents,
     addMyEvent,
     editMyEvent,
+    editParticipation,
     deleteMyEvent
 };

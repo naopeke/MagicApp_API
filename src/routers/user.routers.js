@@ -16,5 +16,5 @@ router.post('/login', userCtrl.loginUser);
 // *NOTE -  Login
 // router.post('/loginUser', )
 
-
+module.exports = router;
 
