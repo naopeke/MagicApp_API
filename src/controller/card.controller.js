@@ -3,13 +3,14 @@ const axios = require('axios');
 
 const fetchCardData = async (req, res, next) => {
     if (req.query.cardName) {
-        // スペースをプラス記号に置き換え
+        // GET https://api.scryfall.com/cards/named?fuzzy=aust+com  hay que cambiar espacio por '+'
+
         const cardName = req.query.cardName.split(' ').join('+');
         try {
             const response = await axios.get(`https://api.scryfall.com/cards/named?fuzzy=${encodeURI(cardName)}`);
             const cardData = {
                 id: response.data.id,
-                image_uris: response.data.image_uris?.normal, // image_urisがundefinedの場合のためのオプショナルチェイニング
+                image_uris: response.data.image_uris.normal, 
                 name: response.data.name,
                 type_line: response.data.type_line,
                 oracle_text: response.data.oracle_text,
@@ -18,9 +19,9 @@ const fetchCardData = async (req, res, next) => {
                 legalities: response.data.legalities,
                 set_name: response.data.set_name,
                 set_type: response.data.set_type,
-                prices: response.data.prices?.eur // pricesがundefinedの場合のためのオプショナルチェイニング
+                prices: response.data.prices.eur
             };
-            res.json(cardData); // クライアントにカードデータをJSON形式で返す
+            res.json(cardData); // mandar en formato json
         } catch (err) {
             console.log('Error fetching card data', err);
             res.status(500).send('Error fetching card data');
