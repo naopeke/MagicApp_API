@@ -23,8 +23,8 @@ const fetchCardData = async (req, res, next) => {
             };
             res.json(cardData); // mandar en formato json
         } catch (err) {
-            console.log('Error fetching card data', err);
-            res.status(500).send('Error fetching card data');
+            console.log('Error fetching', err);
+            res.status(500).send('Error in fetching card data');
         }
     } else {
         res.status(400).send('Card name is required');
