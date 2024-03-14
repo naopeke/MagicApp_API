@@ -1,4 +1,4 @@
-const { connection } =  require('../database');
+const { pool } =  require('../database');
 const axios = require('axios');
 
 const fetchCardData = async (req, res, next) => {
@@ -30,6 +30,10 @@ const fetchCardData = async (req, res, next) => {
         res.status(400).send('Card name is required');
     }
 };
+
+//https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+//500 Internal Server Error
+//400 Bad Request
 
 
 const addCards = async (req, res, next) => {

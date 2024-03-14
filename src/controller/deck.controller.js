@@ -1,4 +1,5 @@
-const { connection } =  require('../database');
+const { pool } =  require('../database');
+const axios = require('axios');
 
 // router.get('/mis-mazos/:id_user', deckCtrl.getDecks);
 // router.post('/mis-mazos', deckCtrl.addDeck);

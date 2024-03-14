@@ -1,4 +1,4 @@
-const { connection } =  require('../database');
+const { pool } =  require('../database');
 
 const registerUser = async (req, res, next) => {
     try {
