@@ -16,28 +16,7 @@ const fetchCardData = async (req, res, next) => {
                 oracle_text: response.data.oracle_text,
                 printed_text: response.data.printed_text,
                 color_identity: response.data.color_identity,
-                legalities: response.data.legalities.standard,
-                legalities: response.data.legalities.future,
-                legalities: response.data.legalities.historic,
-                legalities: response.data.legalities.timeless,
-                legalities: response.data.legalities.gladiator,
-                legalities: response.data.legalities.pioneer,
-                legalities: response.data.legalities.explorer,
-                legalities: response.data.legalities.modern,
-                legalities: response.data.legalities.legacy,
-                legalities: response.data.legalities.pauper,
-                legalities: response.data.legalities.vintage,
-                legalities: response.data.legalities.penny,
-                legalities: response.data.legalities.commander,
-                legalities: response.data.legalities.oathbreaker,
-                legalities: response.data.legalities.standardbrawl,
-                legalities: response.data.legalities.brawl,
-                legalities: response.data.legalities.alchemy,
-                legalities: response.data.legalities.paupercommander,
-                legalities: response.data.legalities.duel,
-                legalities: response.data.legalities.oldschool,
-                legalities: response.data.legalities.premodern,
-                legalities: response.data.legalities.predh,
+                legalities: response.data.legalities,
                 set_name: response.data.set_name,
                 set_type: response.data.set_type,
                 prices: response.data.prices.eur
@@ -55,6 +34,7 @@ const fetchCardData = async (req, res, next) => {
 //https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
 //500 Internal Server Error
 //400 Bad Request
+
 
 
 const addCards = async (req, res, next) => {
