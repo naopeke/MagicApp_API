@@ -1,19 +1,22 @@
 const { connection } =  require('../database');
 
+
 const registerUser = async (req, res, next) => {
-    const respuesta = {
+    let respuesta = {
         error: false,
         codigo: 200,
         mensaje: "La operación se ha realizado con éxito"
     };
 
-    const user = {
+    let user = {
         nameUser: 'Nombre',
         emailUser: 'email',
         passwordUser: 'contraseña'
     }
 
     try {
+        user = req.body; 
+
         let sqlEmail = "SELECT emailUser from user WHERE emailUser = '" + user.emailUser + "'";
         let [checkEmail] = await pool.query(sqlEmail);
         if(checkEmail.length){
@@ -25,6 +28,7 @@ const registerUser = async (req, res, next) => {
             "VALUES ('" + user.nameUser + "', '" +
             user.emailUser + "','" +
             user.passwordUser + "')";
+            console.log(sql);
             await pool.query(sql);
             let sqlUser = "SELECT id_user FROM user WHERE emailUser = '" + user.emailUser + "'";
             let [userId] = await pool.query(sqlUser);
@@ -38,6 +42,9 @@ const registerUser = async (req, res, next) => {
         console.log('register catch');
     }
 }
+
+
+
 
 const loginUser = async (req, res, next) => {
     const respuesta = {
