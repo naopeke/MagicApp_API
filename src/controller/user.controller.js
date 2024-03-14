@@ -1,7 +1,6 @@
 const { pool } =  require('../database');
 
 
-
 const registerUser = async (req, res, next) => {
     let respuesta = {
         error: false,
