@@ -31,6 +31,10 @@ const fetchCardData = async (req, res, next) => {
     }
 };
 
+//https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+//500 Internal Server Error
+//400 Bad Request
+
 
 const addCards = async (req, res, next) => {
     try {
