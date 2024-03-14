@@ -1,6 +1,6 @@
 const mysql = require("mysql2");
 
-const connection = mysql.createConnection({
+const pool = mysql.createConnection({
     host:       process.env.DB_HOST         || "magydeck.c92woie8epi1.eu-west-3.rds.amazonaws.com",
     user:       process.env.DB_USER         || "admin",
     password:   process.env.DB_PASSWORD     || "magydeck2024*",
@@ -10,4 +10,4 @@ const connection = mysql.createConnection({
 
 console.log('Conexión con la BBDD creada');
 
-module.exports = { connection };
+module.exports = { pool };

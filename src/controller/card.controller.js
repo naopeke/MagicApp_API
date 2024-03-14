@@ -1,4 +1,4 @@
-const { connection } =  require('../database');
+const { pool } =  require('../database');
 const axios = require('axios');
 
 const fetchCardData = async (req, res, next) => {
