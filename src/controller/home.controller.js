@@ -55,25 +55,30 @@ const getEventsCommunity = async(req, res) => {
     }
 }
 
-const putParticipacion = async (req, res) =>{
+const postParticipacion = async (req, res) =>{
     let respuesta;
     try{
         let params = [req.body.id_user, req.body.id_event]
 
-        let putParticipacion = `UPDATE magydeck.userEvent SET participation = 1
-        WHERE  id_user = 1 AND id_event = 1 AND participation != 0`
-    
-        let [result] = await pool.query(putParticipacion, params)
-        console.log([result]);
+        let existQuery = `SELECT * FROM  magydeck.userEvent 
+        WHERE  id_user = ? AND id_event = ?`
 
-        if(result.info == 'Rows matched: 1  Changed: 0  Warnings: 0'){
+        let [exist] = await pool.query(existQuery, params)
+
+        if(exist.length > 0){
             respuesta = {error: true, codigo: 200, mensaje: 'Ya participas en el evento'}
-
-        } else {
-            respuesta = {error: false, codigo: 200, mensaje: '¡Ahora participas en el evento'}
         }
-        res.json(respuesta)
+        else {
+            let postParticipacion = 'INSERT INTO magydeck.userEvent (id_user, id_event, participation) VALUES (?, ?, 1)'
         
+            let [result] = await pool.query(postParticipacion, params)
+            console.log([result]);
+            
+            respuesta = {error: false, codigo: 200, mensaje: '¡Ahora participas en el evento'}
+            
+        }
+
+        res.json(respuesta)
     }
 
     catch (error){
@@ -84,10 +89,10 @@ const putParticipacion = async (req, res) =>{
 const getBestDecks = async (req, res) => {
     let respuesta;
     try{
-        let getDecks = `SELECT mediaScore, deck.photoDeck, deck.nameDeck, user.nameUser 
-        FROM magydeck.deckCard 
-        JOIN magydeck.user ON (deckCard.id_user = user.id_user) 
-        JOIN magydeck.deck ON (deckCard.id_deck = deck.id_deck)
+        let getDecks = `SELECT mediaScore, nameDeck, photoDeck.URLphoto, user.nameUser 
+        FROM magydeck.deck 
+        JOIN magydeck.user ON (deck.id_user = user.id_user)
+        JOIN magydeck.photoDeck ON (deck.id_photoDeck = photoDeck.id_photoDeck)
         ORDER BY mediaScore DESC LIMIT 3`
     
         let [result] = await pool.query(getDecks)
@@ -110,4 +115,4 @@ const getBestDecks = async (req, res) => {
 }
 
 
-module.exports = {putParticipacion, getMyEvents, getEventsCommunity, getBestDecks}
+module.exports = {postParticipacion, getMyEvents, getEventsCommunity, getBestDecks}
