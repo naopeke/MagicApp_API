@@ -1,4 +1,5 @@
 const {pool} = require('../database')
+const { format } = require('date-fns');
 
 const getMyEvents = async(req, res) => {
     let respuesta;
@@ -12,6 +13,11 @@ const getMyEvents = async(req, res) => {
         ORDER BY evento.date ASC LIMIT 3`
 
         let [result] = await pool.query(getEvents, params)
+  
+        result.forEach(evento => {
+            evento.date = format(new Date(evento.date), 'yyyy-MM-dd')
+            evento.hour = evento.hour.slice(0, 5); 
+        });
         console.log(result);
 
         if(result.length == 0){
@@ -33,14 +39,19 @@ const getEventsCommunity = async(req, res) => {
     try{
         let params = req.params.id_user
 
-        let getEvents = `SELECT id_user, participation, magydeck.evento.*
-        FROM magydeck.userEvent
-        JOIN magydeck.evento ON (userEvent.id_event = evento.id_event)
-        WHERE id_user = ? AND (participation = 0 OR participation IS NULL)
+        let getEvents = `SELECT user.id_user, magydeck.evento.* FROM magydeck.evento
+        JOIN magydeck.userEvent ON (evento.id_event = userEvent.id_event)
+        JOIN magydeck.user ON (userEvent.id_user = user.id_user)
+        WHERE user.id_user != ?
         ORDER BY evento.date ASC LIMIT 3`
 
         let [result] = await pool.query(getEvents, params)
+        result.forEach(evento => {
+            evento.date = format(new Date(evento.date), 'yyyy-MM-dd')
+            evento.hour = evento.hour.slice(0, 5); 
+        });
         console.log(result);
+
 
         if(result.length == 0){
             respuesta = {error: true, codigo: 200, mensaje: 'No se han encontrado eventos de la comunidad en los que NO participes'}
@@ -89,7 +100,7 @@ const postParticipacion = async (req, res) =>{
 const getBestDecks = async (req, res) => {
     let respuesta;
     try{
-        let getDecks = `SELECT mediaScore, nameDeck, photoDeck.URLphoto, user.nameUser 
+        let getDecks = `SELECT id_deck, mediaScore, nameDeck, photoDeck.URLphoto, user.nameUser 
         FROM magydeck.deck 
         JOIN magydeck.user ON (deck.id_user = user.id_user)
         JOIN magydeck.photoDeck ON (deck.id_photoDeck = photoDeck.id_photoDeck)
