@@ -1,17 +1,14 @@
 const { Router } = require ('express');
 const router = Router();
-const userCtrl = require('../controller/user.controller');
+const userCtrl = require('../controller/user.controller.js');
 
 
 
 router.post('/register', userCtrl.registerUser);
 
-router.post('/login', userCtrl.loginUser);
+// router.post('/login', userCtrl.loginUser);
 
 
-
-// *NOTE -  Registrar
-// router.post('/register', )
 
 // *NOTE -  Login
 // router.post('/loginUser', )
