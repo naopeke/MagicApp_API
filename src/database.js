@@ -14,7 +14,7 @@ const pool = mysql.createPool({
     password:   process.env.DB_PASSWORD     || "magydeck2024*",
     database:   process.env.DB_NAME         || "magydeck",
     port:       process.env.DB_PORT         || 3306
-    }).promise();
+    });
 
 
 console.log('Conexión con la BBDD creada');
