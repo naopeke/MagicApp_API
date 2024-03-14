@@ -1,4 +1,4 @@
-const { connection } =  require('../database');
+const { pool } =  require('../database');
 
 const getProfile = async (req, res, next) => {
     try {

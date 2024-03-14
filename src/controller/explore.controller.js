@@ -1,4 +1,4 @@
-const { connection } =  require('../database');
+const { pool } =  require('../database');
 
 const getSharedDecks = async (req, res, next) => {
     try {
