@@ -1,6 +1,5 @@
 const { pool } =  require('../database');
 
-
 const registerUser = async (req, res, next) => {
     let respuesta = {
         error: false,
@@ -9,9 +8,9 @@ const registerUser = async (req, res, next) => {
     };
 
     let user = {
-        nameUser: 'Nombre',
-        emailUser: 'email',
-        passwordUser: 'contraseña',
+        nameUser: '',
+        emailUser: '',
+        passwordUser: '',
     }
 
     try {
@@ -30,21 +29,18 @@ const registerUser = async (req, res, next) => {
             user.passwordUser + "')";
             console.log(sql);
             await pool.query(sql);
-            // let sqlUser = "SELECT id_user FROM user WHERE emailUser = '" + user.emailUser + "'";
-            // let [userId] = await pool.query(sqlUser);
-            // user.id_user = userId[0].id_user;
-            // user.passwordUser = null;
         }
-        res.send(respuesta);
+        res.status(200).send(respuesta);
         console.log('register try');
     }catch(err){
         console.error(err);
+        respuesta.error = true;
+        respuesta.codigo = 500;
+        respuesta.mensaje = 'Ha ocurrido un error';
+        res.status(200).send(respuesta);
         console.log('register catch');
     }
 }
-
-
-
 
 const loginUser = async (req, res, next) => {
     const response = {
@@ -64,27 +60,20 @@ const loginUser = async (req, res, next) => {
             response.message = "Login incorrecto";
             response.code = 400; 
         }
+        res.status(200).send(response);
         console.log('login try');
     } catch (error){
         response.err = true; 
         response.message = "Ocurrió un error";
-        response.code = 500; 
+        response.code = 500;
+        res.status(200).send(response);
         console.error('login catch', error);
-    }
-    res.send(response); 
+    } 
 }
-
-
-
-const logoutUser = (req, res, next) => {
-    res.json({ success: true });
-}
-
 
 module.exports = {
     registerUser,
     loginUser,
     // getUser,
-    // editUser,
-    logoutUser
+    // editUser
 };
