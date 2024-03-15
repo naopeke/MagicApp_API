@@ -40,11 +40,15 @@ const getEventsCommunity = async(req, res) => {
     try{
         let params = req.params.id_user
 
-        let getEvents = `SELECT userEvent.id_user, user.nameUser , userEvent.creator, magydeck.evento.*
+        let getEvents = `SELECT DISTINCT magydeck.evento.*, userEvent.id_user, COUNT(userEvent.id_event) 
         FROM magydeck.evento
         JOIN magydeck.userEvent ON (evento.id_event = userEvent.id_event)
         JOIN magydeck.user ON (userEvent.id_user = user.id_user)
-        WHERE userEvent.id_user != ?
+        WHERE userEvent.id_event NOT IN(
+            SELECT id_event
+            FROM userEvent
+            WHERE id_user = ?)
+        GROUP BY userEvent.id_event
         ORDER BY evento.date ASC LIMIT 3`
 
         let [result] = await pool.query(getEvents, params)
@@ -139,7 +143,7 @@ const deleteParticipacion = async (req, res) =>{
             respuesta = {error: true, codigo: 200, mensaje: 'No participas en el evento'}
         }
         else {
-            let postParticipacion = 'DELETE FROM magydeck.userEvent WHERE userEvent.id_user = 2 AND userEvent.id_event = 4'
+            let postParticipacion = 'DELETE FROM magydeck.userEvent WHERE userEvent.id_user = ? AND userEvent.id_event = ?'
         
             let [result] = await pool.query(postParticipacion, params)
             console.log([result]);
