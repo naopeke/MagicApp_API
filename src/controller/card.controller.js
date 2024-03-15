@@ -103,7 +103,7 @@ const addCards = async (req, res, next) => {
         let [insertDeckCardResult] = await pool.query(insertDeckCardResult, [id_deck, id_card_api]);
         console.log(insertDeckCardResult);
  
-        res.status(200).send('Card added to deck successfully');
+        res.status(200).send('Card added to deck');
 
     } catch {
         console.log(err);
@@ -113,16 +113,7 @@ const addCards = async (req, res, next) => {
 }
 
 
-const deleteCards = async (req, res, next) => {
-    try {
-        console.log('add cards try');
-    } catch {
-        console.log('add cards catch');
-    }
-}
-
 module.exports = {
     fetchCardData,
     addCards,
-    deleteCards
 };
