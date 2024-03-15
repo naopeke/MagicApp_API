@@ -6,10 +6,11 @@ const getMyEvents = async(req, res) => {
     try{
         let params = req.params.id_user
 
-        let getEvents = `SELECT id_user, participation, magydeck.evento.*
+        let getEvents = `SELECT userEvent.id_user, user.nameUser, magydeck.evento.*
         FROM magydeck.userEvent
         JOIN magydeck.evento ON (userEvent.id_event = evento.id_event)
-        WHERE id_user = ? AND participation = 1
+        JOIN magydeck.user ON (userEvent.id_user = user.id_user)
+        WHERE userEvent.id_user = ? 
         ORDER BY evento.date ASC LIMIT 3`
 
         let [result] = await pool.query(getEvents, params)
@@ -39,10 +40,11 @@ const getEventsCommunity = async(req, res) => {
     try{
         let params = req.params.id_user
 
-        let getEvents = `SELECT user.id_user, magydeck.evento.* FROM magydeck.evento
+        let getEvents = `SELECT userEvent.id_user, user.nameUser , userEvent.creator, magydeck.evento.*
+        FROM magydeck.evento
         JOIN magydeck.userEvent ON (evento.id_event = userEvent.id_event)
         JOIN magydeck.user ON (userEvent.id_user = user.id_user)
-        WHERE user.id_user != ?
+        WHERE userEvent.id_user != ?
         ORDER BY evento.date ASC LIMIT 3`
 
         let [result] = await pool.query(getEvents, params)
@@ -66,6 +68,32 @@ const getEventsCommunity = async(req, res) => {
     }
 }
 
+const getParticipantes = async (req, res) => {
+    let respuesta;
+    try{
+        let params = req.params.id_event
+
+        let participantes = `SELECT userEvent.id_user, user.nameUser, userEvent.id_event, userEvent.creator FROM magydeck.userEvent
+        JOIN magydeck.user ON (userEvent.id_user = user.id_user)
+        WHERE id_event = ?`
+
+        let [result] = await pool.query(participantes, params)
+  
+        console.log(result);
+
+        if(result.length == 0){
+            respuesta = {error: true, codigo: 200, mensaje: 'No se han encontrado participantes'}
+        }else{
+            respuesta = {error: false, codigo: 200, mensaje: 'Participantes recuperados', data: result}
+        }
+        
+        res.json(respuesta)
+        
+    }
+    catch (error){
+        console.error(`Error: ${error}`);
+    }
+}
 const postParticipacion = async (req, res) =>{
     let respuesta;
     try{
@@ -80,13 +108,43 @@ const postParticipacion = async (req, res) =>{
             respuesta = {error: true, codigo: 200, mensaje: 'Ya participas en el evento'}
         }
         else {
-            let postParticipacion = 'INSERT INTO magydeck.userEvent (id_user, id_event, participation) VALUES (?, ?, 1)'
+            let postParticipacion = 'INSERT INTO magydeck.userEvent (id_user, id_event) VALUES (?, ?)'
         
             let [result] = await pool.query(postParticipacion, params)
             console.log([result]);
             
             respuesta = {error: false, codigo: 200, mensaje: '¡Ahora participas en el evento'}
             
+        }
+
+        res.json(respuesta)
+    }
+
+    catch (error){
+        console.error(`Error: ${error}`);
+    }
+}
+
+const deleteParticipacion = async (req, res) =>{
+    let respuesta;
+    try{
+        let params = [req.body.id_user, req.body.id_event]
+
+        let existQuery = `SELECT * FROM  magydeck.userEvent 
+        WHERE  id_user = ? AND id_event = ?`
+
+        let [exist] = await pool.query(existQuery, params)
+
+        if(exist.length == 0){
+            respuesta = {error: true, codigo: 200, mensaje: 'No participas en el evento'}
+        }
+        else {
+            let postParticipacion = 'DELETE FROM magydeck.userEvent WHERE userEvent.id_user = 2 AND userEvent.id_event = 4'
+        
+            let [result] = await pool.query(postParticipacion, params)
+            console.log([result]);
+            
+            respuesta = {error: false, codigo: 200, mensaje: '¡Has abandonado el evento!'}
         }
 
         res.json(respuesta)
@@ -126,4 +184,4 @@ const getBestDecks = async (req, res) => {
 }
 
 
-module.exports = {postParticipacion, getMyEvents, getEventsCommunity, getBestDecks}
+module.exports = {postParticipacion, getMyEvents, getEventsCommunity, getBestDecks, deleteParticipacion, getParticipantes}
