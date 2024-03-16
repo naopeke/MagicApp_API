@@ -73,28 +73,42 @@ const fetchCardData = async (req, res, next) => {
 //
 const addCards = async (req, res, next) => {
     let respuesta;
-    let params = [req.body.id];
-    let params2 = [req.body.id_deck, req.body.id];
+    // const { id_user, id_deck, id_card_api } = req.body;
+
+    let params = [req.body.id_user, req.body.id_deck];
+    let params2 = [req.body.id];
+    let params3 = [req.body.id_deck, req.body.id];
 
     try {
-        // buscar si existe la misma carta
 
-        let cardExist = 'SELECT id_card FROM magydeck.card WHERE id = ?';
-        console.log(cardExist);
-        const [cardExistResult] = await pool.query(cardExist, params);
-        console.log(cardExistResult);
+        // detectar el dueño de deck
+        let deckOwner = 'SELECT id_deck FROM magydeck.deck WHERE id_deck = ? AND id_user = ?';
+        console.log(deckOwner);
+        const [deckOwnerResult] = await pool.query(deckOwner, params);
+        if (deckOwnerResult.length === 0) {
+            respuesta = {error: true, codigo: 200, mensaje: 'id_user es distinto'}
+        }else{
+            respuesta = {error: false, codigo: 200, mensaje: 'ok', data: deckOwnerResult}
+        }
+
+
+        // buscar si existe la misma carta
+        let cardExists = 'SELECT id_card FROM magydeck.card WHERE id = ?';
+        console.log(cardExists);
+        const [cardExistsResult] = await pool.query(cardExists, params2);
+        console.log(cardExistsResult);
 
         // si no existe, añadir como la nueva carta
-        if (cardExist.length === 0){
-            let insertCard = 'INSERT INTO magydeck.card (id) VALUES(?)';
+        if (cardExists.length === 0){
+            let insertCard = 'INSERT INTO magydeck.card (id, quantity) VALUES(?, 1)';
             console.log(insertCard);
-            const [insertCardResult] = await pool.query(insertCard, params);
+            const [insertCardResult] = await pool.query(insertCard, params2);
             console.log(insertCardResult);
         } else {
             //si existe, +1 cantidad
             let addQuantity = 'UPDATE magydeck.card SET quantity = quantity + 1 WHERE id = ?';
             console.log(addQuantity);
-            const [addQuantityResult] = await pool.query(addQuantity, params);
+            const [addQuantityResult] = await pool.query(addQuantity, params2);
             console.log(addQuantityResult);
         }
 
@@ -102,7 +116,7 @@ const addCards = async (req, res, next) => {
         // usar id_card de table card para deckCard
         let insertDeckCard = 'INSERT INTO magydeck.deckCard (id_deck, id_card) VALUES (?, (SELECT id_card FROM magydeck.card WHERE id = ?))';
         console.log(insertDeckCard);
-        let [insertDeckCardResult] = await pool.query(insertDeckCard, params2);
+        let [insertDeckCardResult] = await pool.query(insertDeckCard, params3);
         console.log(insertDeckCardResult);
  
         res.status(200).send('Card added to deck');
