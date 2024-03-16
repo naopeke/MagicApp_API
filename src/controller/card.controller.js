@@ -25,10 +25,12 @@ const fetchCardData = async (req, res, next) => {
             res.json(cardData); // mandar en formato json
         } catch (err) {
             console.log('Error fetching', err);
-            res.status(500).send('Error in fetching card data');
+            // res.status(500).send('Error in fetching card data');
+            res.status(500).json({error: true, codigo: 500, mensaje: 'Error fetching card data'});
         }
-    } else {
-        res.status(400).send('Card name is required');
+        } else {
+        // res.status(400).send('Card name is required');
+        res.status(404).json({error: true, codigo: 404, mensaje: 'Card not found'});
     }
 };
 
@@ -36,37 +38,6 @@ const fetchCardData = async (req, res, next) => {
 //500 Internal Server Error
 //400 Bad Request
 
-
-
-// const fetchCollectiondData = async (req, res, next) => {
-//     if (req.query.cardName) {
-//         // GET https://api.scryfall.com/cards/named?fuzzy=aust+com  hay que cambiar espacio por '+'
-
-//         const cardName = req.query.cardName.split(' ').join('+');
-//         try {
-//             const response = await axios.get(`https://api.scryfall.com/cards/named?fuzzy=${encodeURI(cardName)}`);
-//             const cardData = {
-//                 id: response.data.id,
-//                 image_uris: response.data.image_uris.normal, 
-//                 name: response.data.name,
-//                 type_line: response.data.type_line,
-//                 oracle_text: response.data.oracle_text,
-//                 printed_text: response.data.printed_text,
-//                 color_identity: response.data.color_identity,
-//                 legalities: response.data.legalities,
-//                 set_name: response.data.set_name,
-//                 set_type: response.data.set_type,
-//                 prices: response.data.prices.eur
-//             };
-//             res.json(cardData); // mandar en formato json
-//         } catch (err) {
-//             console.log('Error fetching', err);
-//             res.status(500).send('Error in fetching card data');
-//         }
-//     } else {
-//         res.status(400).send('Card name is required');
-//     }
-// };
 
 // POST /api/mis-mazos/{deckId}/cards
 
