@@ -25,11 +25,9 @@ const fetchCardData = async (req, res, next) => {
             res.json(cardData); // mandar en formato json
         } catch (err) {
             console.log('Error fetching', err);
-            // res.status(500).send('Error in fetching card data');
             res.status(500).json({error: true, codigo: 500, mensaje: 'Error fetching card data'});
         }
         } else {
-        // res.status(400).send('Card name is required');
         res.status(404).json({error: true, codigo: 404, mensaje: 'Card not found'});
     }
 };
@@ -37,13 +35,14 @@ const fetchCardData = async (req, res, next) => {
 //https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
 //500 Internal Server Error
 //400 Bad Request
+//404 Not Found
 
 
 // POST /api/mis-mazos/{deckId}/cards
 
 //
 const addCards = async (req, res, next) => {
-    let respuesta;
+
     // const { id_user, id_deck, id_card_api } = req.body;
 
     let params = [req.body.id_user, req.body.id_deck];
@@ -57,10 +56,12 @@ const addCards = async (req, res, next) => {
         console.log(deckOwner);
         const [deckOwnerResult] = await pool.query(deckOwner, params);
         if (deckOwnerResult.length === 0) {
-            respuesta = {error: true, codigo: 200, mensaje: 'id_user es distinto'}
+            res.status(404).json({error: true, codigo: 404, mensaje: 'id_user es distinto'});
         }else{
-            respuesta = {error: false, codigo: 200, mensaje: 'ok', data: deckOwnerResult}
+            res.json({error: false, codigo: 200, mensaje: 'ok', data: deckOwnerResult});
         }
+        //403 Forbidden
+
 
 
         // buscar si existe la misma carta
@@ -69,6 +70,7 @@ const addCards = async (req, res, next) => {
         const [cardExistsResult] = await pool.query(cardExists, params2);
         console.log(cardExistsResult);
 
+        
         // si no existe, añadir como la nueva carta
         if (cardExists.length === 0){
             let insertCard = 'INSERT INTO magydeck.card (id, quantity) VALUES(?, 1)';
@@ -90,11 +92,11 @@ const addCards = async (req, res, next) => {
         let [insertDeckCardResult] = await pool.query(insertDeckCard, params3);
         console.log(insertDeckCardResult);
  
-        res.status(200).send('Card added to deck');
+        res.json({error: false, codigo: 200, mensaje: 'Card added to deck'});
 
     } catch {
         console.log(err);
-        res.status(500).send('Server error');
+        res.status(500).json({error: true, codigo: 500, mensaje: 'Server error'});
         next(err);
     }
 }
