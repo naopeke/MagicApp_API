@@ -73,9 +73,6 @@ const registerUser = async (req, res, next) => {
     }
 }
 
-
-
-
 const loginUser = async (req, res, next) => {
     const respuesta = {
         error: false,
