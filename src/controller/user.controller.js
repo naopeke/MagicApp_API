@@ -78,9 +78,10 @@ const loginUser = async (req, res, next) => {
         console.error('login catch', error);
     } 
 }
-}
 
 module.exports = {
     registerUser,
-    loginUser
+    loginUser,
+    loginUser,
+
 };
