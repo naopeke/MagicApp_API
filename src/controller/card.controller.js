@@ -104,10 +104,10 @@ const addCard = async (req, res, next) => {
 
 const addCards = async (req, res, next) => {
 
-    let params = [req.body.id_user, req.body.id_deck];
+    let { id_user, id_deck, cardIds } = req.body; //cardIds es array de cardIds
 
-    const { id_deck, cardIds } = req.body; //cardIds es array de cardIds
-  
+    let params = [req.body.id_deck, req.body.id_user,];  
+
     try {
       const deckOwner = 'SELECT id_deck FROM magydeck.deck WHERE id_deck = ? AND id_user = ?';
         console.log(deckOwner);
@@ -122,9 +122,10 @@ const addCards = async (req, res, next) => {
         // bucle para array de cardIds
         const params2 = [cardId]; 
         const params3 = [id_deck, cardId]; 
+
         const cardsExist = 'SELECT id_card FROM magydeck.card WHERE id = ?';
         console.log(cardsExist);
-        const [cardsExistResult] = await pool.query(cardExistsQuery, params2);
+        const [cardsExistResult] = await pool.query(cardsExist, params2);
         console.log(cardsExistResult);
   
         if (cardsExistResult.length === 0) {
@@ -140,6 +141,7 @@ const addCards = async (req, res, next) => {
       }
   
       res.json({error: false, codigo: 200, mensaje: 'Cards added to deck'});
+      
     } catch (err) {
       console.log(err);
       res.status(500).json({error: true, codigo: 500, mensaje: 'Server error'});
