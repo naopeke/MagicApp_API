@@ -8,7 +8,7 @@ router.get('/eventos/?:id_user', eventCtrl.getMyEvents);
 
 router.get('/eventos/?:id_event', eventCtrl.getMyEvents);
 
-router.get('/eventos/', eventCtrl.getOthersEvents); // hay que cambiar endpoint
+// router.get('/eventos/', eventCtrl.getOthersEvents); // hay que cambiar endpoint
 
 router.post('/eventos', eventCtrl.addMyEvent);
 
