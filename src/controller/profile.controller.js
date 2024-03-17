@@ -1,6 +1,30 @@
 
 const { pool } =  require('../database');
 
+const getProfle = async(req, res, next) => {
+    try{
+        let respuesta; 
+        let params = req.params.id_user
+
+        let getProfle = `SELECT * FROM magydeck.user
+        WHERE id_user = ?`
+
+        let [result] = await pool.query(getProfle, params)
+        if(result.length == 1){
+            respuesta = {error:false, codigo: 200, mensaje: 'Datos recuperados correctamente', data: result};
+        } else {
+            respuesta = {error:true, codigo: 200, mensaje: 'No existe el usuario', data: result};
+        }
+       
+        console.log(result);
+        res.json(respuesta);
+    }
+
+    catch{
+
+    }
+}
+
 const putProfile = async (req, res, next) => {
     try {
         let respuesta;
@@ -70,6 +94,7 @@ const putAvatar = async (req, res, next) => {
 }
 
 module.exports = {
+    getProfle,
     putProfile,
     putPassword,
     putAvatar

@@ -1,3 +1,4 @@
+const { log } = require('console');
 const { pool } =  require('../database');
 
 const registerUser = async (req, res, next) => {
@@ -82,6 +83,7 @@ const loginUser = async (req, res, next) => {
     try {
         let sql = "SELECT * FROM magydeck.user WHERE user.emailUser = '" + req.body.emailUser + "' AND user.passwordUser = '" + req.body.passwordUser + "'";
         let [result] = await pool.query(sql);
+        console.log(result);
         if(result.length){
             response.data = result.length ? result[0] : null;
         } else {
