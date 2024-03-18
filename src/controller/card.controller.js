@@ -38,6 +38,18 @@ const fetchCardData = async (req, res, next) => {
 //404 Not Found
 
 
+const getDeckIdByIndex = async (req, res, next) => {
+    let params = [req.params.index];
+    let userId = [req.query.user_id];
+
+    try {
+        let getDeckId = 'SELECT id_deck FROM magydeck.deck WHERE id_user = AND d?' 
+    } catch {
+
+    }
+
+}
+
 // POST /api/mis-mazos/{deckId}/cards
 
 //
