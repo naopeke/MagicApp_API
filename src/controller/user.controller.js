@@ -86,7 +86,6 @@ const loginUser = async (req, res, next) => {
             // response.data = result.length ? result[0] : null;
 
             const userData = result[0];
-            // userData に id_user フィールドを追加
             // userData.id_user = userData.id_user;
             // response.data = userData;
             console.log('user data', userData);
