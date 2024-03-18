@@ -72,31 +72,45 @@ const registerUser = async (req, res, next) => {
 }
 
 const loginUser = async (req, res, next) => {
-    const response = {
-        err: false,
-        code: 200,
-        message: "La operación se ha realizado con éxito",
-        data: null
-    };
+    // const response = {
+    //     err: false,
+    //     code: 200,
+    //     message: "La operación se ha realizado con éxito",
+    //     data: null
+    // };
 
     try {
         let sql = "SELECT * FROM magydeck.user WHERE user.emailUser = '" + req.body.emailUser + "' AND user.passwordUser = '" + req.body.passwordUser + "'";
         let [result] = await pool.query(sql);
         if(result.length){
-            response.data = result.length ? result[0] : null;
+            // response.data = result.length ? result[0] : null;
+
+            const userData = result[0];
+            // userData に id_user フィールドを追加
+            // userData.id_user = userData.id_user;
+            // response.data = userData;
+            console.log('user data', userData);
+
+
+            res.send(userData);
         } else {
-            response.err = true;
-            response.message = "Login incorrecto";
-            response.code = 400; 
+            // response.err = true;
+            // response.message = "Login incorrecto";
+            // response.code = 400; 
+            res.status(400).json({error: true, codigo: 400, mensaje: 'Login incorrecto'});
+
         }
-        res.status(200).send(response);
-        console.log('login try');
+        // res.status(200).send(response);
+        // res.send(userData);
+
     } catch (error){
-        response.err = true; 
-        response.message = "Ocurrió un error";
-        response.code = 500;
-        res.status(200).send(response);
-        console.error('login catch', error);
+        // response.err = true; 
+        // response.message = "Ocurrió un error";
+        // response.code = 500;
+        // res.status(200).send(response);
+        // console.error('login catch', error);
+        res.status(400).json({error: true, codigo: 400, mensaje: 'Login incorrecto'});
+
     } 
 }
 

@@ -114,33 +114,33 @@ const addCards = async (req, res, next) => {
       const [deckOwnerResult] = await pool.query(deckOwner, params);
         console.log(deckOwnerResult);
   
-      if (deckOwnerResult.length === 0) {
-        res.status(404).json({error: true, codigo: 404, mensaje: 'not a deck owner'});
-      }
+      // if (deckOwnerResult.length === 0) {
+      //   res.status(404).json({error: true, codigo: 404, mensaje: 'not a deck owner'});
+      // }
   
-      for (const cardId of cardIds) {
-        // bucle para array de cardIds
-        const params2 = [cardId]; 
-        const params3 = [id_deck, cardId]; 
+      // for (const cardId of cardIds) {
+      //   // bucle para array de cardIds
+      //   const params2 = [cardId]; 
+      //   const params3 = [id_deck, cardId]; 
 
-        const cardsExist = 'SELECT id_card FROM magydeck.card WHERE id = ?';
-        console.log(cardsExist);
-        const [cardsExistResult] = await pool.query(cardsExist, params2);
-        console.log(cardsExistResult);
+      //   const cardsExist = 'SELECT id FROM magydeck.card WHERE id_card = ?';
+      //   console.log(cardsExist);
+      //   const [cardsExistResult] = await pool.query(cardsExist, params2);
+      //   console.log(cardsExistResult);
   
-        if (cardsExistResult.length === 0) {
-        // si no existe, insertar cantidad 1
-          await pool.query('INSERT INTO magydeck.card (id, quantity) VALUES(?, 1)', params2);
-        } else {
-        // si existe, update cantidad +1
-          await pool.query('UPDATE magydeck.card SET quantity = quantity + 1 WHERE id = ?', params2);
-        }
+      //   if (cardsExistResult.length === 0) {
+      //   // si no existe, insertar cantidad 1
+      //     await pool.query('INSERT INTO magydeck.card (id_card, quantity) VALUES(?, 1)', params2);
+      //   } else {
+      //   // si existe, update cantidad +1
+      //     await pool.query('UPDATE magydeck.card SET quantity = quantity + 1 WHERE id = ?', params2);
+      //   }
   
-        // agregar id_card a id_deck
-        await pool.query('INSERT INTO magydeck.deckCard (id_deck, id_card) VALUES (?, ?)', params3);
-      }
+      //   // agregar id_card a id_deck
+      //   await pool.query('INSERT INTO magydeck.deckCard (id_deck, id_card) VALUES (?, ?)', params3);
+      // }
   
-      res.json({error: false, codigo: 200, mensaje: 'Cards added to deck'});
+      // res.json({error: false, codigo: 200, mensaje: 'Cards added to deck'});
       
     } catch (err) {
       console.log(err);
