@@ -6,10 +6,9 @@ const getMyEvents = async(req, res) => {
     try{
         let params = req.params.id_user
 
-        let getEvents = `SELECT userEvent.id_user, user.nameUser, magydeck.evento.*
+        let getEvents = `SELECT userEvent.id_user, magydeck.evento.*
         FROM magydeck.userEvent
         JOIN magydeck.evento ON (userEvent.id_event = evento.id_event)
-        JOIN magydeck.user ON (userEvent.id_user = user.id_user)
         WHERE userEvent.id_user = ? 
         ORDER BY evento.date ASC LIMIT 3`
 
@@ -40,16 +39,15 @@ const getEventsCommunity = async(req, res) => {
     try{
         let params = req.params.id_user
 
-        let getEvents = `SELECT DISTINCT magydeck.evento.*, userEvent.id_user, COUNT(userEvent.id_event) 
+        let getEvents = `SELECT DISTINCT magydeck.evento.*, userEvent.id_user, user.avatar
         FROM magydeck.evento
         JOIN magydeck.userEvent ON (evento.id_event = userEvent.id_event)
         JOIN magydeck.user ON (userEvent.id_user = user.id_user)
-        WHERE userEvent.id_event NOT IN(
+        WHERE creator = 1 AND userEvent.id_event NOT IN(
             SELECT id_event
             FROM userEvent
             WHERE id_user = ?)
-        GROUP BY userEvent.id_event
-        ORDER BY evento.date ASC LIMIT 3`
+            ORDER BY evento.date ASC LIMIT 3`
 
         let [result] = await pool.query(getEvents, params)
         result.forEach(evento => {

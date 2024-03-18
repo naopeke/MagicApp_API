@@ -2,9 +2,12 @@ const { Router } = require ('express');
 const router = Router();
 const exploreCtrl = require('../controller/explore.controller');
 
-router.get('/explora', exploreCtrl.getSharedDecks);
 
 router.get('/explora/votados', exploreCtrl.getVotedDecks);
+router.get('/explora', exploreCtrl.getSharedDecks);
+router.get('/explora/user/:nameUser', exploreCtrl.getDeckbyUser)
+router.get('/explora/deck/:nameDeck', exploreCtrl.getDeckbyDeck)
+router.put('/explora/mediaScore', exploreCtrl.putMediaScore)
 
 router.get('/explora/:id_deck', exploreCtrl.getDeckById);
 
