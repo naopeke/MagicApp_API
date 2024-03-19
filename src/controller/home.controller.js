@@ -162,11 +162,9 @@ const deleteParticipacion = async (req, res) =>{
 const getBestDecks = async (req, res) => {
     let respuesta;
     try{
-        let getDecks = `SELECT id_deck, mediaScore, nameDeck, photoDeck.URLphoto, user.nameUser 
-        FROM magydeck.deck 
-        JOIN magydeck.user ON (deck.id_user = user.id_user)
-        JOIN magydeck.photoDeck ON (deck.id_photoDeck = photoDeck.id_photoDeck)
-        ORDER BY mediaScore DESC LIMIT 3`
+        let getDecks = `SELECT user.nameUser, magydeck.deck.*, (sumScores/nScores) AS mediaScore FROM magydeck.deck
+        JOIN user ON (deck.id_user = user.id_user)
+        WHERE share = 1`
     
         let [result] = await pool.query(getDecks)
         console.log(result);
