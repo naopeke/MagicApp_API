@@ -38,157 +38,91 @@ const fetchCardData = async (req, res, next) => {
 //404 Not Found
 
 
-// POST /api/mis-mazos/{deckId}/cards
-const getDeckIdByUserAndIndex = async (req, res, next) => {
-    let params = [req.params.user_id, req.params.indexDeck]; // パスパラメータを使用する
+//* Obtener id_deck desde id_user y indexDeck
+// SELECT id_deck 
+// FROM magydeck.deck 
+// WHERE id_user = 13 AND indexDeck = 3
 
+//* Contar si hay misma card.id dento de deckCard.id_deck
+// SELECT COUNT(*) AS cardCount 
+// FROM magydeck.deckCard 
+// JOIN magydeck.card ON magydeck.deckCard.id_card = magydeck.card.id_card
+// JOIN magydeck.deck ON magydeck.deckCard.id_deck = magydeck.deck.id_deck
+// WHERE deckCard.id_deck = 13 AND card.id = 'cc0b6054-7d3a-4b6f-bc40-5c9e88cf4b6e'
+
+//* Si hay, obtener id_card con id
+// SELECT magydeck.card.id_card
+// FROM magydeck.card
+// JOIN magydeck.deckCard ON magydeck.card.id_card = magydeck.deckCard.id_card
+// JOIN magydeck.deck ON magydeck.deckCard.id_deck = magydeck.deck.id_deck
+// WHERE magydeck.deckCard.id_deck = 13 AND magydeck.card.id = 'cc0b6054-7d3a-4b6f-bc40-5c9e88cf4b6e';
+
+//* Y update quantity +1
+// UPDATE magydeck.deckCard 
+// SET quantity = quantity + 1 
+// WHERE id_deck = 13 AND id_card = 3
+
+//* si no existe
+//*1. insertar id(api) en card
+// INSERT INTO magydeck.card (id)
+// VALUES ('f935e21d-f20c-4f73-92b6-e2e2ea8841af');
+
+// INSERT INTO magydeck.card (id) 
+// VALUES ();
+
+//*2. obtener el ultimo id
+// SELECT LAST_INSERT_ID() AS new_id_card;
+
+//*3. insertar id_card y quantity
+// INSERT INTO magydeck.deckCard (id_deck, id_card, quantity) 
+// VALUES (13, 57, 1);
+
+// INSERT INTO magydeck.deckCard (id_deck, id_card, quantity) 
+// VALUES (?, ?, 1);
+
+
+
+const addCardsToDeck = async (req, res, next) => {
     try {
+        // obtener deck_id con user_id e indexDeck
+        const deckIdParams = [req.params.user_id, req.params.indexDeck];
         const getDeckIdByUserAndIndex = 'SELECT id_deck FROM magydeck.deck WHERE id_user = ? AND indexDeck = ?';
-        console.log(getDeckIdByUserAndIndex);
-        const [getDeckIdByUserAndIndexResult] = await pool.query(getDeckIdByUserAndIndex, params);
-        console.log(getDeckIdByUserAndIndexResult);
-        if (getDeckIdByUserAndIndexResult.length > 0){
-            res.json({ deckId: getDeckIdByUserAndIndexResult[0].id_deck });
-        } else {
-            res.status(404).json({ error: true, code: 404, message: 'Deck not found for user and index' });
+        const [getDeckIdResult] = await pool.query(getDeckIdByUserAndIndex, deckIdParams);
+        const deckId = getDeckIdResult[0].id_deck;
+
+        // comprobar si existe esa carta en deck o no
+        for (const cardId of req.body.cardIds) {
+            const cardCountParams = [deckId, cardId];
+            const checkCardCount = 'SELECT COUNT(*) AS cardCount FROM magydeck.deckCard JOIN magydeck.card ON deckCard.id_card = card.id_card WHERE deckCard.id_deck = ? AND card.id = ?';
+            const [cardCountResult] = await pool.query(checkCardCount, cardCountParams);
+            const cardCount = cardCountResult[0].cardCount;
+
+            if (cardCount > 0) {
+                // si existe esa carta en deck, quantity + 1
+                const updateCardCountParams = [deckId, cardId];
+                const updateCardCount = 'UPDATE magydeck.deckCard SET quantity = quantity + 1 WHERE id_deck = ? AND id_card = ?';
+                await pool.query(updateCardCount, updateCardCountParams);
+                
+            } else {
+                // si no existe, añadir id(api) y conectar con id_deck
+                await pool.query('INSERT INTO magydeck.card (id) VALUES (?)', [cardId]);
+                await pool.query('INSERT INTO magydeck.deckCard (id_deck, id_card, quantity) VALUES (?, ?, 1)', [deckId, cardId]);
+            }
         }
+
+        console.log('Cards added to deck');
+        res.status(200).json({ success: true, code: 200, message: 'Cards added to deck' });
+
     } catch (error) {
-        console.log('getDeckIdByUserAndIndex error: ', error);
+        console.log('Error in adding cards to deck:', error);
         res.status(500).json({ error: true, code: 500, message: 'Server error' });
     }
-}
-
-// SELECT COUNT(*) AS cardCount
-// FROM magydeck.deckCard
-// JOIN magydeck.card ON deckCard.id_card = card.id_card
-// WHERE deckCard.id_deck = ? AND card.id = ?
-
-
-const checkCardCount = async (req, res, next) => {
-    let params = [req.params.indexDeck]; // indexDeckを使用する
-    try {
-        let cardCount = 'SELECT COUNT(*) AS cardCount FROM magydeck.deckCard JOIN magydeck.card ON deckCard.id_card = card.id_card WHERE deckCard.id_deck = ? AND card.id = ?';
-        console.log(cardCount);
-        const [cardCountResult] = await pool.query(cardCount, params);
-        console.log(cardCountResult);
-        // 必要に応じてレスポンスを返す
-    } catch (err) {
-        console.log(err);
-        // エラーハンドリング
-    }
-}
+};
 
 
 
 
 
-//
-// const addCard = async (req, res, next) => {
-
-//     // const { id_user, id_deck, id_card_api } = req.body;
-
-//     let params = [req.body.id_user, req.body.id_deck];
-//     let params2 = [req.body.id];
-//     let params3 = [req.body.id_deck, req.body.id];
-
-//     try {
-
-//         // detectar el dueño de deck
-//         let deckOwner = 'SELECT id_deck FROM magydeck.deck WHERE id_deck = ? AND id_user = ?';
-//         console.log(deckOwner);
-//         const [deckOwnerResult] = await pool.query(deckOwner, params);
-//         if (deckOwnerResult.length === 0) {
-//             res.status(404).json({error: true, codigo: 404, mensaje: 'not a deck owner'});
-//         }else{
-//             res.json({error: false, codigo: 200, mensaje: 'ok', data: deckOwnerResult});
-//         }
-//         //403 Forbidden
-
-
-
-//         // buscar si existe la misma carta
-//         let cardExists = 'SELECT id_card FROM magydeck.card WHERE id = ?';
-//         console.log(cardExists);
-//         const [cardExistsResult] = await pool.query(cardExists, params2);
-//         console.log(cardExistsResult);
-
-        
-//         // si no existe, añadir como la nueva carta
-//         if (cardExists.length === 0){
-//             let insertCard = 'INSERT INTO magydeck.card (id, quantity) VALUES(?, 1)';
-//             console.log(insertCard);
-//             const [insertCardResult] = await pool.query(insertCard, params2);
-//             console.log(insertCardResult);
-//         } else {
-//             //si existe, +1 cantidad
-//             let addQuantity = 'UPDATE magydeck.card SET quantity = quantity + 1 WHERE id = ?';
-//             console.log(addQuantity);
-//             const [addQuantityResult] = await pool.query(addQuantity, params2);
-//             console.log(addQuantityResult);
-//         }
-
-
-//         // usar id_card de table card para deckCard
-//         let insertDeckCard = 'INSERT INTO magydeck.deckCard (id_deck, id_card) VALUES (?, (SELECT id_card FROM magydeck.card WHERE id = ?))';
-//         console.log(insertDeckCard);
-//         let [insertDeckCardResult] = await pool.query(insertDeckCard, params3);
-//         console.log(insertDeckCardResult);
- 
-//         res.json({error: false, codigo: 200, mensaje: 'Card added to deck'});
-
-//     } catch {
-//         console.log(err);
-//         res.status(500).json({error: true, codigo: 500, mensaje: 'Server error'});
-//         next(err);
-//     }
-// }
-
-
-// const addCards = async (req, res, next) => {
-
-//     let { id_user, id_deck, cardIds } = req.body; //cardIds es array de cardIds
-
-//     let params = [req.body.id_deck, req.body.id_user,];  
-
-//     try {
-//       const deckOwner = 'SELECT id_deck FROM magydeck.deck WHERE id_deck = ? AND id_user = ?';
-//         console.log(deckOwner);
-//       const [deckOwnerResult] = await pool.query(deckOwner, params);
-//         console.log(deckOwnerResult);
-  
-//       // if (deckOwnerResult.length === 0) {
-//       //   res.status(404).json({error: true, codigo: 404, mensaje: 'not a deck owner'});
-//       // }
-  
-//       // for (const cardId of cardIds) {
-//       //   // bucle para array de cardIds
-//       //   const params2 = [cardId]; 
-//       //   const params3 = [id_deck, cardId]; 
-
-//       //   const cardsExist = 'SELECT id FROM magydeck.card WHERE id_card = ?';
-//       //   console.log(cardsExist);
-//       //   const [cardsExistResult] = await pool.query(cardsExist, params2);
-//       //   console.log(cardsExistResult);
-  
-//       //   if (cardsExistResult.length === 0) {
-//       //   // si no existe, insertar cantidad 1
-//       //     await pool.query('INSERT INTO magydeck.card (id_card, quantity) VALUES(?, 1)', params2);
-//       //   } else {
-//       //   // si existe, update cantidad +1
-//       //     await pool.query('UPDATE magydeck.card SET quantity = quantity + 1 WHERE id = ?', params2);
-//       //   }
-  
-//       //   // agregar id_card a id_deck
-//       //   await pool.query('INSERT INTO magydeck.deckCard (id_deck, id_card) VALUES (?, ?)', params3);
-//       // }
-  
-//       // res.json({error: false, codigo: 200, mensaje: 'Cards added to deck'});
-      
-//     } catch (err) {
-//       console.log(err);
-//       res.status(500).json({error: true, codigo: 500, mensaje: 'Server error'});
-//     }
-//   };
 
   
 
@@ -196,6 +130,5 @@ module.exports = {
     fetchCardData,
     getDeckIdByUserAndIndex,
     checkCardExists,
-    // addCard,
-    // addCards
+    addCardsToDeck
 };
