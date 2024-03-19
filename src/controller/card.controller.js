@@ -114,6 +114,7 @@ const addCardsToDeck = async (req, res, next) => {
                 const updateCardCount = 'UPDATE magydeck.deckCard SET quantity = quantity + 1 WHERE id_deck = ? AND id_card = ?';
                 const [updateCardCountResult] = await pool.query(updateCardCount, updateCardCountParams);
                 console.log('id_card: ', cardId, 'id_deck: ', deckId, 'result: ', updateCardCountResult); 
+          
             } else {
                 // si no existe, añadir id(api) y conectar con id_deck
                 const getCardIdParams = [ids];
@@ -128,7 +129,7 @@ const addCardsToDeck = async (req, res, next) => {
                 console.log('New card: ', cardId, 'deck_id: ', deckId, addNewCardToDeckcardResult);   
             }
             console.log('Cards added to deck');
-            res.status(200).json({ success: true, code: 200, message: 'Cards added to deck' });
+            res.status(200).json({ error: false, code: 200, message: 'Cards added to deck' });
             }
         
         } catch (error) {

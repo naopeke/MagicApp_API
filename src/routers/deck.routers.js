@@ -2,7 +2,7 @@ const { Router } = require ('express');
 const router = Router();
 const deckCtrl = require('../controller/deck.controller');
 
-router.get('/mis-mazos/:id_user', deckCtrl.getMyDecks);
+router.get('/mis-mazos/', deckCtrl.getMyDecks);
 
 router.post('/mis-mazos', deckCtrl.addMyDeck);
 
