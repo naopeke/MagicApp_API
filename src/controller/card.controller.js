@@ -85,10 +85,11 @@ const fetchCardData = async (req, res, next) => {
 const addCardsToDeck = async (req, res, next) => {
     try {
         // obtener deck_id con user_id e indexDeck
-        const deckIdParams = [req.params.user_id, req.params.indexDeck];
+        const deckIdParams = [req.body.user_id, req.body.indexDeck];
         const getDeckIdByUserAndIndex = 'SELECT id_deck FROM magydeck.deck WHERE id_user = ? AND indexDeck = ?';
         const [getDeckIdResult] = await pool.query(getDeckIdByUserAndIndex, deckIdParams);
         const deckId = getDeckIdResult[0].id_deck;
+        console.log('deckId by user and index: ', deckId);
 
         // comprobar si existe esa carta en deck o no
         for (const cardId of req.body.cardIds) {
@@ -96,17 +97,25 @@ const addCardsToDeck = async (req, res, next) => {
             const checkCardCount = 'SELECT COUNT(*) AS cardCount FROM magydeck.deckCard JOIN magydeck.card ON deckCard.id_card = card.id_card WHERE deckCard.id_deck = ? AND card.id = ?';
             const [cardCountResult] = await pool.query(checkCardCount, cardCountParams);
             const cardCount = cardCountResult[0].cardCount;
+            console.log('cardCount: ', cardCount);
 
             if (cardCount > 0) {
                 // si existe esa carta en deck, quantity + 1
                 const updateCardCountParams = [deckId, cardId];
                 const updateCardCount = 'UPDATE magydeck.deckCard SET quantity = quantity + 1 WHERE id_deck = ? AND id_card = ?';
-                await pool.query(updateCardCount, updateCardCountParams);
-                
+                const [updateCardCountResult] = await pool.query(updateCardCount, updateCardCountParams);
+                console.log('card_id: ', cardId, 'deck_id: ', deckId, 'result: ', updateCardCountResult);
             } else {
                 // si no existe, añadir id(api) y conectar con id_deck
-                await pool.query('INSERT INTO magydeck.card (id) VALUES (?)', [cardId]);
-                await pool.query('INSERT INTO magydeck.deckCard (id_deck, id_card, quantity) VALUES (?, ?, 1)', [deckId, cardId]);
+                const addNewCardParams = [cardId];
+                const addNewCard = 'INSERT INTO magydeck.card (id) VALUES (?)';
+                const [addNewCardResult] = await pool.query(addNewCard, addNewCardParams);
+                console.log('New card: ', addNewCardResult);
+
+                const addNewCardToDeckcardParams = [deckId, cardId]
+                const addNewCardToDeckcard = 'INSERT INTO magydeck.deckCard (id_deck, id_card, quantity) VALUES (?, ?, 1)';
+                const [addNewCardToDeckcardResult] = await pool.query(addNewCardToDeckcard, addNewCardToDeckcardParams);           
+                console.log('New card: ', cardId, 'deck_id: ', deckId, addNewCardToDeckcardResult);
             }
         }
 
@@ -118,17 +127,9 @@ const addCardsToDeck = async (req, res, next) => {
         res.status(500).json({ error: true, code: 500, message: 'Server error' });
     }
 };
-
-
-
-
-
-
   
 
 module.exports = {
     fetchCardData,
-    getDeckIdByUserAndIndex,
-    checkCardExists,
     addCardsToDeck
 };
