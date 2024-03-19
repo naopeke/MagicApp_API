@@ -130,6 +130,7 @@ const addCardsToDeck = async (req, res, next) => {
             console.log('Cards added to deck');
             res.status(200).json({ success: true, code: 200, message: 'Cards added to deck' });
             }
+        
         } catch (error) {
         console.log('Error in adding cards to deck:', error);
         res.status(500).json({ error: true, code: 500, message: 'Server error' });
