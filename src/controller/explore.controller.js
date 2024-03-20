@@ -23,17 +23,35 @@ const getSharedDecks = async (req, res, next) => {
     }
 }
 
-const getDeckbyUser = async (req, res, next) => {
+const getDeck = async (req, res, next) => {
     let respuesta;
+    
     try {
-        let params = req.params.nameUser
-        let deck = `SELECT user.nameUser, magydeck.deck.* FROM magydeck.deck
-        JOIN user ON (deck.id_user = user.id_user)
-        WHERE share = 1 AND user.nameUser = ?`
-        
+        let params; 
+        let deck;
+        if (req.params.nameUser){
+            params = req.params.nameUser
+            
+            deck = `SELECT user.nameUser, ROUND((sumScores/nScores),1) AS mediaScore, magydeck.deck.* FROM magydeck.deck
+            JOIN user ON (deck.id_user = user.id_user)
+            WHERE share = 1 AND user.nameUser = ?`
+
+        } else if (req.params.nameDeck){
+            params = req.params.nameDeck
+            deck = `SELECT user.nameUser, ROUND((sumScores/nScores),1) AS mediaScore, magydeck.deck.* FROM magydeck.deck
+            JOIN user ON (deck.id_user = user.id_user)
+            WHERE share = 1 AND deck.nameDeck = ?`
+        } else {
+            params = null
+
+            deck = `SELECT user.nameUser, ROUND((sumScores/nScores),1) AS mediaScore, magydeck.deck.* FROM magydeck.deck
+            JOIN user ON (deck.id_user = user.id_user)
+            WHERE share = 1`
+        }
+
         let [result] = await pool.query(deck, params)
         if(result.length == 0){
-            respuesta = {error: true, codigo: 200, mensaje: 'Usuario no encontrado'}
+            respuesta = {error: true, codigo: 200, mensaje: 'No se encontraron resultados'}
         } else {
             respuesta = {error: false, codigo: 200, mensaje: 'Mazos recuperados', data: result}
         }
@@ -45,27 +63,27 @@ const getDeckbyUser = async (req, res, next) => {
     }
 }
 
-const getDeckbyDeck = async (req, res, next) => {
-    let respuesta;
-    try {
-        let params = req.params.nameDeck
-        let deck = `SELECT user.nameUser, magydeck.deck.* FROM magydeck.deck
-        JOIN user ON (deck.id_user = user.id_user)
-        WHERE share = 1 AND deck.nameDeck = ?`
+// const getDeckbyDeck = async (req, res, next) => {
+//     let respuesta;
+//     try {
+//         let params = req.params.nameDeck
+//         let deck = `SELECT user.nameUser, ROUND((sumScores/nScores),1) AS mediaScore, magydeck.deck.* FROM magydeck.deck
+//         JOIN user ON (deck.id_user = user.id_user)
+//         WHERE share = 1 AND deck.nameDeck = ?`
         
-        let [result] = await pool.query(deck, params)
-        if(result.length == 0){
-            respuesta = {error: true, codigo: 200, mensaje: 'Mazo no encontrado'}
-        } else {
-            respuesta = {error: false, codigo: 200, mensaje: 'Mazos recuperados', data: result}
-        }
+//         let [result] = await pool.query(deck, params)
+//         if(result.length == 0){
+//             respuesta = {error: true, codigo: 200, mensaje: 'Mazo no encontrado'}
+//         } else {
+//             respuesta = {error: false, codigo: 200, mensaje: 'Mazos recuperados', data: result}
+//         }
 
-        res.json(respuesta)
+//         res.json(respuesta)
 
-    } catch(error) {
-        console.error(`Error: ${error}`);
-    }
-}
+//     } catch(error) {
+//         console.error(`Error: ${error}`);
+//     }
+// }
 
 const getVotedDecks = async (req, res, next) => {
     let respuesta;
@@ -168,8 +186,7 @@ const getDeckById = async (req, res, next) => {
 module.exports = {
     getSharedDecks,
     getVotedDecks,
-    getDeckbyUser,
-    getDeckbyDeck,
+    getDeck,
     putMediaScore,
     getDeckById
 };

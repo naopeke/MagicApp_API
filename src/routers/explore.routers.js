@@ -5,10 +5,9 @@ const exploreCtrl = require('../controller/explore.controller');
 
 router.get('/explora/votados', exploreCtrl.getVotedDecks);
 router.get('/explora', exploreCtrl.getSharedDecks);
-router.get('/explora/user/:nameUser', exploreCtrl.getDeckbyUser)
-router.get('/explora/deck/:nameDeck', exploreCtrl.getDeckbyDeck)
+router.get('/explora/user/:nameUser', exploreCtrl.getDeck)
+router.get('/explora/deck/:nameDeck', exploreCtrl.getDeck)
 router.put('/explora/mediaScore', exploreCtrl.putMediaScore)
-
 router.get('/explora/:id_deck', exploreCtrl.getDeckById);
 
 

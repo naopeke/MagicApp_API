@@ -160,7 +160,7 @@ const deleteParticipacion = async (req, res) =>{
 const getBestDecks = async (req, res) => {
     let respuesta;
     try{
-        let getDecks = `SELECT id_deck, mediaScore, nameDeck, photoDeck.URLphoto, user.nameUser 
+        let getDecks = `SELECT id_deck, nameDeck, photoDeck.URLphoto, user.nameUser, ROUND((sumScores/nScores),1) AS mediaScore 
         FROM magydeck.deck 
         JOIN magydeck.user ON (deck.id_user = user.id_user)
         JOIN magydeck.photoDeck ON (deck.id_photoDeck = photoDeck.id_photoDeck)
