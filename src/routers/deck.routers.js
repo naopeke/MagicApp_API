@@ -4,11 +4,13 @@ const deckCtrl = require('../controller/deck.controller');
 
 router.get('/mis-mazos/', deckCtrl.getMyDecks);
 
-router.post('/mis-mazos', deckCtrl.addMyDeck);
+// router.get('/mis-mazos/?:id_deck', deckCtrl.getMyDeckById);
 
-router.put('/mis-mazos/:nameDeck', deckCtrl.editMyDeckName);
+router.get('/mis-mazos/?:id', deckCtrl.fetchCardDataById);
 
-router.put('/mis-mazos', deckCtrl.editMyDeck);
+router.put('/mis-mazos/?:id_deck', deckCtrl.editMyDeckName);
+
+router.put('/mis-mazos/', deckCtrl.editMyDeck);
 
 router.put('/mis-mazos/compartir', deckCtrl.mySharedDeck);
 
