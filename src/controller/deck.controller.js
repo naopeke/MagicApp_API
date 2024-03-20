@@ -73,66 +73,61 @@ const axios = require('axios');
 
 
 
-const fetchCardDataById = async (id) => {
+const getMyDecksWithData = async (req, res, next) => {
     try {
-        const response = await axios.get(`https://api.scryfall.com/cards/${id}`);
-        const cardData = {
-            id: response.data.id,
-            image_uris: response.data.image_uris.normal, 
-            name: response.data.name,
-            printed_name: response.data.printed_name,
-            type_line: response.data.type_line,
-            oracle_text: response.data.oracle_text,
-            printed_text: response.data.printed_text,
-            color_identity: response.data.color_identity,
-            legalities: response.data.legalities,
-            set_name: response.data.set_name,
-            set_type: response.data.set_type,
-            prices: response.data.prices.eur
-        };
-        return cardData;
-    } catch (err) {
-        console.log('Error fetching with id', err);
-        throw new Error('Error fetching card data with id');
-    }
-}
+        const getMyDecksWithDataParams = [req.body.id_user];
+        const getMyDecksWithData = `
+            SELECT deck.id_deck, deck.indexDeck, deck.nameDeck, deckCard.id_card, card.id, deck.share, deckCard.quantity 
+            FROM magydeck.deck 
+            JOIN magydeck.deckCard ON deck.id_deck = deckCard.id_deck 
+            JOIN magydeck.card ON deckCard.id_card = card.id_card 
+            WHERE id_user = ? 
+            ORDER BY deck.id_deck ASC, deck.indexDeck ASC;
+            `;
+        const [getMyDecksWithDataResult] = await pool.query(getMyDecksWithData, getMyDecksWithDataParams);
+  
+        const decks = [];
+        for (const deck of getMyDecksWithDataResult) {
+            try {
+                const response = await axios.get(`https://api.scryfall.com/cards/${deck.id}`);
+                const cardData = {
+                    id: response.data.id,
+                    image_uris: response.data.image_uris.normal, 
+                    name: response.data.name,
+                    printed_name: response.data.printed_name,
+                    type_line: response.data.type_line,
+                    oracle_text: response.data.oracle_text,
+                    printed_text: response.data.printed_text,
+                    color_identity: response.data.color_identity,
+                    legalities: response.data.legalities,
+                    set_name: response.data.set_name,
+                    set_type: response.data.set_type,
+                    prices: response.data.prices.eur
+                };
+                decks.push({
+                    id_deck: deck.id_deck,
+                    indexDeck: deck.indexDeck,
+                    nameDeck: deck.nameDeck,
+                    card: {
+                        id_card: deck.id_card,
+                        id: deck.id,
+                        ...cardData
+                    },
+                    share: deck.share,
+                    quantity: deck.quantity
+                });
 
-
-const getMyDecks = async (req, res, next) => {
-    try {
-        const userId = req.body.id_user;
-        const getMyDecksQuery = `SELECT deck.id_deck, deck.indexDeck, deck.nameDeck, card.id_card, card.id, deck.share, deckCard.quantity 
-                                FROM magydeck.deck 
-                                JOIN magydeck.deckCard ON deck.id_deck = deckCard.id_deck 
-                                JOIN magydeck.card ON deckCard.id_card = card.id_card 
-                                WHERE id_user = ? 
-                                ORDER BY deck.id_deck ASC, deck.indexDeck ASC;`;
-        const [getMyDecksResult] = await pool.query(getMyDecksQuery, [userId]);
-
-        const decks = getMyDecksResult.map(async (deck) => {
-            const cardData = await fetchCardDataById(deck.id);
-            return {
-                id_deck: deck.id_deck,
-                indexDeck: deck.indexDeck,
-                nameDeck: deck.nameDeck,
-                card: {
-                    id_card: deck.id_card,
-                    id: deck.id,
-                    ...cardData
-                },
-                share: deck.share,
-                quantity: deck.quantity
-            };
-        });
-
-        const allDecksData = await Promise.all(decks);
-
-        res.status(200).json({ error: false, code: 200, message: "Got Decks' data", data: allDecksData });
+            } catch (err) {
+                console.log('Error fetching card data with id', deck.id, err);
+            }
+        }
+        res.status(200).json({ error: false, code: 200, message: "Got Decks' data", data: decks });
+   
     } catch (error) {
         console.log('Error getting deck info:', error);
         res.status(500).json({ error: true, code: 500, message: 'Server error' });
     }
-}
+};
 
 
 const editMyDeckName = async (req, res, next) => {
@@ -146,6 +141,18 @@ const editMyDeckName = async (req, res, next) => {
 const editMyDeck = async (req, res, next) => {
     try {
         console.log('edit deck try');
+          // クライアントからのリクエストから必要な情報を取得
+          const { cardId, action } = req.body;
+
+          // データベースの操作を行う（例：カードの数量を増やす）
+          if (action === 'increase') {
+              // カードの数量を増やす処理
+          } else if (action === 'decrease') {
+              // カードの数量を減らす処理
+          } else if (action === 'delete') {
+              // カードを削除する処理
+          }
+  
     } catch {
         console.log('edit deck catch');
     }
@@ -162,8 +169,7 @@ const mySharedDeck = async (req, res, next) => {
 
 module.exports = {
     // getMyDeckById,
-    fetchCardDataById,
-    getMyDecks,
+    getMyDecksWithData,
     editMyDeckName,
     editMyDeck,
     mySharedDeck

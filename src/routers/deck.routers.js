@@ -2,13 +2,13 @@ const { Router } = require ('express');
 const router = Router();
 const deckCtrl = require('../controller/deck.controller');
 
-router.get('/mis-mazos/', deckCtrl.getMyDecks);
+router.get('/mis-mazos', deckCtrl.getMyDecksWithData);
 
 // router.get('/mis-mazos/?:id_deck', deckCtrl.getMyDeckById);
 
-router.get('/mis-mazos/?:id', deckCtrl.fetchCardDataById);
+// router.get('/mis-mazos/:id', deckCtrl.fetchCardDataById);
 
-router.put('/mis-mazos/?:id_deck', deckCtrl.editMyDeckName);
+router.put('/mis-mazos/:id_deck', deckCtrl.editMyDeckName);
 
 router.put('/mis-mazos/', deckCtrl.editMyDeck);
 
