@@ -118,13 +118,13 @@ const getMyDecksWithData = async (req, res, next) => {
                 });
 
             } catch (err) {
-                console.log('Error fetching card data with id', deck.id, err);
+                console.log('Error fetching decks data', deck.id, err);
             }
         }
         res.status(200).json({ error: false, code: 200, message: "Got Decks' data", data: decks });
    
     } catch (error) {
-        console.log('Error getting deck info:', error);
+        console.log('Error getting decks data:', error);
         res.status(500).json({ error: true, code: 500, message: 'Server error' });
     }
 };
