@@ -2,7 +2,7 @@ const { Router } = require ('express');
 const router = Router();
 const deckCtrl = require('../controller/deck.controller');
 
-router.get('/mis-mazos', deckCtrl.getMyDecksWithData);
+router.get('/mis-mazos/:id_user', deckCtrl.getMyDecksWithData);
 
 // router.get('/mis-mazos/?:id_deck', deckCtrl.getMyDeckById);
 
@@ -10,7 +10,7 @@ router.get('/mis-mazos', deckCtrl.getMyDecksWithData);
 
 router.put('/mis-mazos/:id_deck', deckCtrl.editMyDeckName);
 
-router.put('/mis-mazos/', deckCtrl.editMyDeck);
+router.put('/mis-mazos', deckCtrl.editMyDeck);
 
 router.put('/mis-mazos/compartir', deckCtrl.mySharedDeck);
 

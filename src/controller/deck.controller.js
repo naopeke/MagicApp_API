@@ -75,7 +75,7 @@ const axios = require('axios');
 
 const getMyDecksWithData = async (req, res, next) => {
     try {
-        const getMyDecksWithDataParams = [req.body.id_user];
+        const getMyDecksWithDataParams = [req.params.id_user];
         const getMyDecksWithData = `
             SELECT deck.id_deck, deck.indexDeck, deck.nameDeck, deckCard.id_card, card.id, deck.share, deckCard.quantity 
             FROM magydeck.deck 
