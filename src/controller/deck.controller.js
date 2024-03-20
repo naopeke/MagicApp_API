@@ -3,13 +3,15 @@ const axios = require('axios');
 
 // router.get('/mis-mazos/:id_user', deckCtrl.getDecks);
 // router.post('/mis-mazos', deckCtrl.addDeck);
-// router.put('/mis-mazos/:nameDeck', deckCtrl.editDeckName);
+// router.put('/mis-mazos/:id_deck', deckCtrl.editDeckName);
 // router.put('/mis-mazos', deckCtrl.editDeck);
 // router.put('/mis-mazos/compartir', deckCtrl.shareDeck);
 
 
 const getMyDecks = async (req, res, next) => {
     try {
+        // obtener id_user y id_
+        // console.log(req.body.id_user, req.body.indexDeck);
         console.log('get decks try');
     } catch {
         console.log('get decks catch');

@@ -2,9 +2,10 @@ const { Router } = require ('express');
 const router = Router();
 const profileCtrl = require('../controller/profile.controller');
 
-router.get('/profile/:id_user', profileCtrl.getProfile);
-router.put('/profile/datos', profileCtrl.addProfile);
-router.put('profile/contrasena', profileCtrl.editProfile);
+router.get('/profile/:id_user', profileCtrl.getProfile)
+router.put('/profile/general', profileCtrl.putProfile);
+router.put('/profile/password', profileCtrl.putPassword);
+router.put('/profile/avatar', profileCtrl.putAvatar);
 
 
 
