@@ -73,32 +73,6 @@ const registerUser = async (req, res, next) => {
             console.log(addCardToDeck);
             await pool.query(addCardToDeck, [deckIdValue, cardIdValue]);
 
-
-            ///////////////////////////////////////////////////////////////////////
-
-
-
-
-
-            // // loop de 5 mazos
-            // for (const values of deckValues) {
-            //     // デッキを挿入するクエリ
-            //     let addDeck = "INSERT INTO magydeck.deck (id_user, indexDeck, nameDeck, id_photoDeck, share, sumScores, nScores) VALUES (?, ?, ?, ?, 0, 0, 0)";
-            //     console.log(addDeck);
-            //     await pool.query(addDeck, values);
-            
-            //     // 直前のカードIDを取得
-            //     const [cardIdResult] = await pool.query("SELECT LAST_INSERT_ID() as id_card");
-            //     const cardIdValue = cardIdResult[0].id_card;
-            
-            //     // 直前のデッキIDを取得
-            //     const [deckIdResult] = await pool.query("SELECT LAST_INSERT_ID() as id_deck");
-            //     const deckIdValue = deckIdResult[0].id_deck;
-            
-            //     // デッキにカードを追加するクエリ
-            //     const addCardToDeck = "INSERT INTO magydeck.deckCard (id_deck, id_card, quantity) VALUES (?, ?, 1)";
-            //     console.log(addCardToDeck);
-            //     await pool.query(addCardToDeck, [deckIdValue, cardIdValue]);
             }
             res.status(200).send(respuesta);
             console.log('register try');    
