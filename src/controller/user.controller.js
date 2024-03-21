@@ -31,38 +31,40 @@ const registerUser = async (req, res, next) => {
             console.log(sql);
             await pool.query(sql);
 
-            //https://www.w3schools.com/sql/func_mysql_last_insert_id.asp
-            // obtener el ultimo id_user, y crear 5 mazos con el ultimo id_user
-            let latestIdUser = "SELECT LAST_INSERT_ID() as id_user;"
-            console.log(latestIdUser);
-            let [latestIdUserResult] = await pool.query(latestIdUser);
-            console.log(latestIdUserResult);
-            const userIdParam = [latestIdUserResult[0].id_user];
+            //obtener ultimo ID: id_user
+            const [latestIdUserResult] = await pool.query("SELECT LAST_INSERT_ID() as id_user");
+            const userIdParam = latestIdUserResult[0].id_user;
 
-            let addDeck1 = "INSERT INTO magydeck.deck (id_user, indexDeck, nameDeck, id_photoDeck, share, sumScores, nScores) VALUES (?, 1, 'mazo1', 1, 0, 0, 0)";
-            console.log(addDeck1);
-            await pool.query(addDeck1, userIdParam);
-            
-            let addDeck2 = "INSERT INTO magydeck.deck (id_user, indexDeck, nameDeck, id_photoDeck, share, sumScores, nScores) VALUES (?, 2, 'mazo2', 2, 0, 0, 0)";
-            console.log(addDeck2);
-            await pool.query(addDeck2, userIdParam);
-            
-            let addDeck3 = "INSERT INTO magydeck.deck (id_user, indexDeck, nameDeck, id_photoDeck, share, sumScores, nScores) VALUES (?, 3, 'mazo3', 3, 0, 0, 0)";
-            console.log(addDeck3);
-            await pool.query(addDeck3, userIdParam);
-            
-            let addDeck4 = "INSERT INTO magydeck.deck (id_user, indexDeck, nameDeck, id_photoDeck, share, sumScores, nScores) VALUES (?, 4, 'mazo4', 4, 0, 0, 0)";
-            console.log(addDeck4);
-            await pool.query(addDeck4, userIdParam);
-            
-            let addDeck5 = "INSERT INTO magydeck.deck (id_user, indexDeck, nameDeck, id_photoDeck, share, sumScores, nScores) VALUES (?, 5, 'mazo5', 5, 0, 0, 0)";
-            console.log(addDeck5);
-            await pool.query(addDeck5, userIdParam);
+            const deckValues = [
+                [userIdParam, 1, 'mazo1', 1],
+                [userIdParam, 2, 'mazo2', 2],
+                [userIdParam, 3, 'mazo3', 3],
+                [userIdParam, 4, 'mazo4', 4],
+                [userIdParam, 5, 'mazo5', 5]
+            ];
+        
+            // loop de 5 mazos
+            for (const values of deckValues) {
+                let addDeck = "INSERT INTO magydeck.deck (id_user, indexDeck, nameDeck, id_photoDeck, share, sumScores, nScores) VALUES (?, ?, ?, ?, 0, 0, 0)";
+                console.log(addDeck);
+                await pool.query(addDeck, values);
+        
+                //obtener ultimo ID: id_deck
+                const [deckIdResult] = await pool.query("SELECT LAST_INSERT_ID() as id_deck");
+                const deckIdValue = deckIdResult[0].id_deck;
+        
+                // añadir 1 carta como default
+                const cardValues = [deckIdValue, values[3], 1]; // id_deck, id_card, quantity
+                const addCardToDeck = "INSERT INTO magydeck.deckCard (id_deck, id_card, quantity) VALUES (?, (SELECT id_card FROM magydeck.card WHERE id = '55f46e4f-18d2-4ade-a5cb-ef26256b0f45' LIMIT 1), 1)";
+
+                console.log(addCardToDeck);
+                await pool.query(addCardToDeck, cardValues);
+            }
+
+            res.status(200).send(respuesta);
+            console.log('register try');
         }
-        res.status(200).send(respuesta);
-        console.log('register try');
-
-    }catch(err){
+    } catch(err) {
         console.error(err);
         respuesta.error = true;
         respuesta.codigo = 500;
@@ -71,6 +73,7 @@ const registerUser = async (req, res, next) => {
         console.log('register catch');
     }
 }
+
 
 const loginUser = async (req, res, next) => {
     // const response = {
