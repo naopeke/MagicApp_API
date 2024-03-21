@@ -1,13 +1,6 @@
 const { pool } =  require('../database');
 const axios = require('axios');
 
-// router.get('/mis-mazos/:id_user', deckCtrl.getDecks);
-// router.post('/mis-mazos', deckCtrl.addDeck);
-// router.put('/mis-mazos/:id_deck', deckCtrl.editDeckName);
-// router.put('/mis-mazos', deckCtrl.editDeck);
-// router.put('/mis-mazos/compartir', deckCtrl.shareDeck);
-
-
 //* get id_deck, indexDeck, nameDeck, id_card, id, share, quantity
 // SELECT deck.id_deck, deck.indexDeck, deck.nameDeck, card.id_card, card.id, deck.share, deckCard.quantity 
 // FROM magydeck.deck 
@@ -71,28 +64,58 @@ const axios = require('axios');
 //     }
 // };
 
+class Carta {
+    constructor(id, id_card, id_deck, image_uris, name, printed_name, type_line, oracle_text, printed_text, color_identity, legalities, prices, set_name, set_type, quantity) {
+        this.id = id;
+        this.id_card = id_card;
+        this.id_deck = id_deck;
+        this.image_uris = image_uris;
+        this.name = name;
+        this.printed_name = printed_name;
+        this.type_line = type_line;
+        this.oracle_text = oracle_text;
+        this.printed_text = printed_text;
+        this.color_identity = color_identity;
+        this.legalities = legalities;
+        this.set_name = set_name;
+        this.set_type = set_type;
+        this.prices = prices;
+        this.quantity = quantity;
+    }
+}
 
+class Mazo {
+    constructor(id_deck, nameDeck, nameUser, share, cards) {
+        this.id_deck = id_deck;
+        this.nameDeck = nameDeck;
+        this.nameUser = nameUser;
+        this.share = share;
+        this.cards = cards;
+    }
+}
 
 const getMyDecksWithData = async (req, res, next) => {
     try {
-        const getMyDecksWithDataParams = [req.params.id_user];
-        const getMyDecksWithData = `
-            SELECT deck.id_deck, deck.indexDeck, deck.nameDeck, deckCard.id_card, card.id, deck.share, deckCard.quantity 
+        const userId = req.params.id_user;
+        const getMyDecksWithDataQuery = `
+            SELECT deck.id_deck, deck.indexDeck, deck.nameDeck, deck.share, deckCard.id_card, card.id, deckCard.quantity 
             FROM magydeck.deck 
             JOIN magydeck.deckCard ON deck.id_deck = deckCard.id_deck 
             JOIN magydeck.card ON deckCard.id_card = card.id_card 
             WHERE id_user = ? 
             ORDER BY deck.id_deck ASC, deck.indexDeck ASC;
-            `;
-        const [getMyDecksWithDataResult] = await pool.query(getMyDecksWithData, getMyDecksWithDataParams);
-  
-        const decks = [];
+        `;
+        const [getMyDecksWithDataResult] = await pool.query(getMyDecksWithDataQuery, userId);
+
+        const decksMap = new Map(); // Usar Map con key id_deck デッキIDをキーとするマップ
+
         for (const deck of getMyDecksWithDataResult) {
             try {
                 const response = await axios.get(`https://api.scryfall.com/cards/${deck.id}`);
                 const cardData = {
-                    id: response.data.id,
-                    image_uris: response.data.image_uris.normal, 
+                    id_card: deck.id_card,
+                    id: deck.id,
+                    image_uris: response.data.image_uris.normal,
                     name: response.data.name,
                     printed_name: response.data.printed_name,
                     type_line: response.data.type_line,
@@ -102,59 +125,92 @@ const getMyDecksWithData = async (req, res, next) => {
                     legalities: response.data.legalities,
                     set_name: response.data.set_name,
                     set_type: response.data.set_type,
-                    prices: response.data.prices.eur
+                    prices: response.data.prices ? response.data.prices.eur : null,
+                    quantity: deck.quantity
                 };
-                // decks.push({
-                //     id_deck: deck.id_deck,
-                //     indexDeck: deck.indexDeck,
-                //     nameDeck: deck.nameDeck,
-                //     card: {
-                //         id_card: deck.id_card,
-                //         id: deck.id,
-                //         ...cardData,
-                //         quantity: deck.quantity
-                //     },
-                //     share: deck.share,
-                // });
 
-
-                //* // デッキのデータ構造
-                // {
-                //     id_deck: string; // デッキのID
-                //     indexDeck: number; // デッキのインデックス
-                //     nameDeck: string; // デッキの名前
-                //     share: boolean; // デッキの共有情報
-                //     cards: Card[]; // デッキに含まれるカードのリスト
-                //   }
-
-                
-                decks.push({
-                    id_deck: deck.id_deck,
-                    info: {
+                if (decksMap.has(deck.id_deck)) {
+                    decksMap.get(deck.id_deck).cards.push(cardData);
+                } else {
+                    decksMap.set(deck.id_deck, {
+                        id_deck: deck.id_deck,
                         indexDeck: deck.indexDeck,
                         nameDeck: deck.nameDeck,
-                        card: {
-                            id_card: deck.id_card,
-                            id: deck.id,
-                            ...cardData,
-                            quantity: deck.quantity
-                        },
                         share: deck.share,
-                    }
-                });
-
+                        cards: [cardData]
+                    });
+                }
             } catch (err) {
-                console.log('Error fetching decks data', deck.id, err);
+                console.log('Error fetching card data:', deck.id_card, err);
             }
         }
+
+        const decks = Array.from(decksMap.values());
         res.json(decks);
-        // res.json({ error: false, code: 200, message: "Got Decks' data", data: decks });
    
     } catch (error) {
         console.log('Error getting decks data:', error);
         res.status(500).json({ error: true, code: 500, message: 'Server error' });
     }
 };
+
+
+
+
+// const getMyDecksWithData = async (req, res, next) => {
+//     try {
+//         const userId = req.params.id_user;
+//         const getMyDecksWithDataQuery = `
+//             SELECT deck.id_deck, deck.indexDeck, deck.nameDeck, deckCard.id_card, card.id, deck.share, deckCard.quantity 
+//             FROM magydeck.deck 
+//             JOIN magydeck.deckCard ON deck.id_deck = deckCard.id_deck 
+//             JOIN magydeck.card ON deckCard.id_card = card.id_card 
+//             WHERE id_user = ? 
+//             ORDER BY deck.id_deck ASC, deck.indexDeck ASC;
+//         `;
+//         const [getMyDecksWithDataResult] = await pool.query(getMyDecksWithDataQuery, userId);
+
+//         const decks = [];
+//         for (const deck of getMyDecksWithDataResult) {
+//             try {
+//                 const response = await axios.get(`https://api.scryfall.com/cards/${deck.id}`);
+//                 const cardData = {
+//                     id_card: deck.id_card,
+//                     id: deck.id,
+//                     image_uris: response.data.image_uris.normal,
+//                     name: response.data.name,
+//                     printed_name: response.data.printed_name,
+//                     type_line: response.data.type_line,
+//                     oracle_text: response.data.oracle_text,
+//                     printed_text: response.data.printed_text,
+//                     color_identity: response.data.color_identity,
+//                     legalities: response.data.legalities,
+//                     set_name: response.data.set_name,
+//                     set_type: response.data.set_type,
+//                     prices: response.data.prices ? response.data.prices.eur : null,
+//                     quantity: deck.quantity
+//                 };
+
+//                 decks.push({
+//                     id_deck: deck.id_deck,
+//                     indexDeck: deck.indexDeck,
+//                     nameDeck: deck.nameDeck,
+//                     share: deck.share === 1,
+//                     cards: [cardData]
+//                 });
+
+//             } catch (err) {
+//                 console.log('Error fetching deck data:', deck.id, err);
+//             }
+//         }
+//         res.json(decks);
+   
+//     } catch (error) {
+//         console.log('Error getting decks data:', error);
+//         res.status(500).json({ error: true, code: 500, message: 'Server error' });
+//     }
+// };
+
 
 
 const editMyDeckName = async (req, res, next) => {
