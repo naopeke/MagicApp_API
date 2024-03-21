@@ -104,24 +104,51 @@ const getMyDecksWithData = async (req, res, next) => {
                     set_type: response.data.set_type,
                     prices: response.data.prices.eur
                 };
+                // decks.push({
+                //     id_deck: deck.id_deck,
+                //     indexDeck: deck.indexDeck,
+                //     nameDeck: deck.nameDeck,
+                //     card: {
+                //         id_card: deck.id_card,
+                //         id: deck.id,
+                //         ...cardData,
+                //         quantity: deck.quantity
+                //     },
+                //     share: deck.share,
+                // });
+
+
+                //* // デッキのデータ構造
+                // {
+                //     id_deck: string; // デッキのID
+                //     indexDeck: number; // デッキのインデックス
+                //     nameDeck: string; // デッキの名前
+                //     share: boolean; // デッキの共有情報
+                //     cards: Card[]; // デッキに含まれるカードのリスト
+                //   }
+
+                
                 decks.push({
                     id_deck: deck.id_deck,
-                    indexDeck: deck.indexDeck,
-                    nameDeck: deck.nameDeck,
-                    card: {
-                        id_card: deck.id_card,
-                        id: deck.id,
-                        ...cardData
-                    },
-                    share: deck.share,
-                    quantity: deck.quantity
+                    info: {
+                        indexDeck: deck.indexDeck,
+                        nameDeck: deck.nameDeck,
+                        card: {
+                            id_card: deck.id_card,
+                            id: deck.id,
+                            ...cardData,
+                            quantity: deck.quantity
+                        },
+                        share: deck.share,
+                    }
                 });
 
             } catch (err) {
                 console.log('Error fetching decks data', deck.id, err);
             }
         }
-        res.status(200).json({ error: false, code: 200, message: "Got Decks' data", data: decks });
+        res.json(decks);
+        // res.json({ error: false, code: 200, message: "Got Decks' data", data: decks });
    
     } catch (error) {
         console.log('Error getting decks data:', error);
