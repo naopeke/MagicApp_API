@@ -34,37 +34,76 @@ const registerUser = async (req, res, next) => {
             //obtener ultimo ID: id_user
             const [latestIdUserResult] = await pool.query("SELECT LAST_INSERT_ID() as id_user");
             const userIdParam = latestIdUserResult[0].id_user;
+    
+            // insertar deck
+            let addDeck1 = "INSERT INTO magydeck.deck (id_user, indexDeck, nameDeck, id_photoDeck, share, sumScores, nScores) VALUES (?, 1, 'mazo1', 1, 0, 0, 0)";
+            console.log(addDeck1);
+            await pool.query(addDeck1, [userIdParam]);
 
-            const deckValues = [
-                [userIdParam, 1, 'mazo1', 1],
-                [userIdParam, 2, 'mazo2', 2],
-                [userIdParam, 3, 'mazo3', 3],
-                [userIdParam, 4, 'mazo4', 4],
-                [userIdParam, 5, 'mazo5', 5]
-            ];
-        
-            // loop de 5 mazos
-            for (const values of deckValues) {
-                let addDeck = "INSERT INTO magydeck.deck (id_user, indexDeck, nameDeck, id_photoDeck, share, sumScores, nScores) VALUES (?, ?, ?, ?, 0, 0, 0)";
-                console.log(addDeck);
-                await pool.query(addDeck, values);
-        
-                //obtener ultimo ID: id_deck
-                const [deckIdResult] = await pool.query("SELECT LAST_INSERT_ID() as id_deck");
-                const deckIdValue = deckIdResult[0].id_deck;
-        
-                // añadir 1 carta como default
-                const cardValues = [deckIdValue, values[3], 1]; // id_deck, id_card, quantity
-                const addCardToDeck = "INSERT INTO magydeck.deckCard (id_deck, id_card, quantity) VALUES (?, (SELECT id_card FROM magydeck.card WHERE id = '55f46e4f-18d2-4ade-a5cb-ef26256b0f45' LIMIT 1), 1)";
+            let addDeck2 = "INSERT INTO magydeck.deck (id_user, indexDeck, nameDeck, id_photoDeck, share, sumScores, nScores) VALUES (?, 2, 'mazo2', 2, 0, 0, 0)";
+            console.log(addDeck2);
+            await pool.query(addDeck2, [userIdParam]);
 
-                console.log(addCardToDeck);
-                await pool.query(addCardToDeck, cardValues);
+            let addDeck3 = "INSERT INTO magydeck.deck (id_user, indexDeck, nameDeck, id_photoDeck, share, sumScores, nScores) VALUES (?, 3, 'mazo3', 3, 0, 0, 0)";
+            console.log(addDeck3);
+            await pool.query(addDeck3, [userIdParam]);
+
+            let addDeck4 = "INSERT INTO magydeck.deck (id_user, indexDeck, nameDeck, id_photoDeck, share, sumScores, nScores) VALUES (?, 4, 'mazo4', 4, 0, 0, 0)";
+            console.log(addDeck4);
+            await pool.query(addDeck4, [userIdParam]);
+
+            let addDeck5 = "INSERT INTO magydeck.deck (id_user, indexDeck, nameDeck, id_photoDeck, share, sumScores, nScores) VALUES (?, 5, 'mazo5', 5, 0, 0, 0)";
+            console.log(addDeck5);
+            await pool.query(addDeck5, [userIdParam]);
+    
+            // insertar card
+            const addIdApi = "INSERT INTO magydeck.card (id) VALUES ('55f46e4f-18d2-4ade-a5cb-ef26256b0f45')";
+            await pool.query(addIdApi);
+    
+            // obtener id_card de la ultima card
+            const [cardIdResult] = await pool.query("SELECT LAST_INSERT_ID() as id_card");
+            const cardIdValue = cardIdResult[0].id_card;
+
+            // obtener id_deck con id_user
+            const [deckIdResult] = await pool.query("SELECT id_deck FROM magydeck.deck WHERE id_user = ?", [userIdParam]);
+            const deckIdValue = deckIdResult[0].id_deck;
+    
+            // añadir datos en deckCard
+            const addCardToDeck = "INSERT INTO magydeck.deckCard (id_deck, id_card, quantity) VALUES (?, ?, 1)";
+            console.log(addCardToDeck);
+            await pool.query(addCardToDeck, [deckIdValue, cardIdValue]);
+
+
+            ///////////////////////////////////////////////////////////////////////
+
+
+
+
+
+            // // loop de 5 mazos
+            // for (const values of deckValues) {
+            //     // デッキを挿入するクエリ
+            //     let addDeck = "INSERT INTO magydeck.deck (id_user, indexDeck, nameDeck, id_photoDeck, share, sumScores, nScores) VALUES (?, ?, ?, ?, 0, 0, 0)";
+            //     console.log(addDeck);
+            //     await pool.query(addDeck, values);
+            
+            //     // 直前のカードIDを取得
+            //     const [cardIdResult] = await pool.query("SELECT LAST_INSERT_ID() as id_card");
+            //     const cardIdValue = cardIdResult[0].id_card;
+            
+            //     // 直前のデッキIDを取得
+            //     const [deckIdResult] = await pool.query("SELECT LAST_INSERT_ID() as id_deck");
+            //     const deckIdValue = deckIdResult[0].id_deck;
+            
+            //     // デッキにカードを追加するクエリ
+            //     const addCardToDeck = "INSERT INTO magydeck.deckCard (id_deck, id_card, quantity) VALUES (?, ?, 1)";
+            //     console.log(addCardToDeck);
+            //     await pool.query(addCardToDeck, [deckIdValue, cardIdValue]);
             }
-
             res.status(200).send(respuesta);
-            console.log('register try');
-        }
-    } catch(err) {
+            console.log('register try');    
+        
+        } catch(err) {
         console.error(err);
         respuesta.error = true;
         respuesta.codigo = 500;
