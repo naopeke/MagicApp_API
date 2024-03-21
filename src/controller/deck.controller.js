@@ -107,7 +107,7 @@ const getMyDecksWithData = async (req, res, next) => {
         `;
         const [getMyDecksWithDataResult] = await pool.query(getMyDecksWithDataQuery, userId);
 
-        const decksMap = new Map(); // Usar Map con key id_deck デッキIDをキーとするマップ
+        const decksMap = new Map(); // Usar Map con key: id_deck
 
         for (const deck of getMyDecksWithDataResult) {
             try {
@@ -129,9 +129,17 @@ const getMyDecksWithData = async (req, res, next) => {
                     quantity: deck.quantity
                 };
 
+                //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/has
+                //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/get
+
+                // si existe element con key:id_deck, devuelve boolean
                 if (decksMap.has(deck.id_deck)) {
+
+                    // obtener el valor
                     decksMap.get(deck.id_deck).cards.push(cardData);
                 } else {
+
+                    // añadir key y object al Map
                     decksMap.set(deck.id_deck, {
                         id_deck: deck.id_deck,
                         indexDeck: deck.indexDeck,
