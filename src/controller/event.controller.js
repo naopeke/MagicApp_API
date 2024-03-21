@@ -32,7 +32,7 @@ const getAllEvents = async (req, res, next) => {
         for(let i=0; i<result.length; i++){
 
             //console.log(typeof(result[i].nameEvent));
-            let event = {"id":result[i].id_event,"title":result[i].nameEvent,"date":result[i].date, "hour":result[i].hour, "place":result[i].place,"descriptionEvent":result[i].descriptionEvent, "direction":result[i].direction, "creator":{"id_user":result[i].id_user, "nameUser":result[i].nameUser}};
+            let event = {"id":result[i].id_event,"title":result[i].nameEvent,"date":result[i].date, "hour":result[i].hour, "place":result[i].place,"descriptionEvent":result[i].descriptionEvent, "direction":result[i].direction, "creator":{"id_user":result[i].id_user, "nameUser":result[i].nameUser , "avatar":result[i].avatar}};
             console.log(event);
             // let event = new Event(result[i].id_event, result[i].nameEvent, result[i].date, result[i].hour, result[i].place, result[i].descriptionEvent, result[i].direction, new User(null,result[i].nameUser, null, null,null,null,null));
             console.log(event);
@@ -72,7 +72,7 @@ const getMyEvents = async (req, res, next) => {
         //Generamos el objeto que devemos devolver
         for(let i=0; i<result.length; i++){
 
-            let event = {"id":result[i].id_event,"title":result[i].nameEvent,"date":result[i].date, "hour":result[i].hour, "place":result[i].place,"descriptionEvent":result[i].descriptionEvent, "direction":result[i].direction, "creator":{"id_user":result[i].id_user, "nameUser":result[i].nameUser}};
+            let event = {"id":result[i].id_event,"title":result[i].nameEvent,"date":result[i].date, "hour":result[i].hour, "place":result[i].place,"descriptionEvent":result[i].descriptionEvent, "direction":result[i].direction, "creator":{"id_user":result[i].id_user, "nameUser":result[i].nameUser, "avatar":result[i].avatar}};
             console.log(event);
             //let event = new Event(result[i].id_event, result[i].nameEvent, result[i].date, result[i].hour, result[i].place, result[i].descriptionEvent, result[i].direction, new User(null,result[i].nameUser, null, null,null,null,null));
             console.log(event);
