@@ -12,7 +12,7 @@ router.put('/mis-mazos/:id_deck', deckCtrl.editMyDeckName);
 
 router.put('/mis-mazos/quantity', deckCtrl.updateCardQuantity);
 
-router.put('/mis-mazos/compartir', deckCtrl.mySharedDeck);
+router.put('/mis-mazos/compartir/:id_deck', deckCtrl.mySharedDeck);
 
 
 

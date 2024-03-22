@@ -94,10 +94,10 @@ const editMyDeckName = async (req, res, next) => {
 
         const editDeckNameParams = [req.body.nameDeck, req.params.id_deck]
         const editDeckName = `
-        UPDATE magydeck.deck
-        SET nameDeck = COALESCE(?, nameDeck)
-        WHERE id_deck = ?;
-        `;
+                            UPDATE magydeck.deck
+                            SET nameDeck = COALESCE(?, nameDeck)
+                            WHERE id_deck = ?;
+                            `;
         await pool.query(editDeckName, editDeckNameParams);
         console.log('edit deck name try');
         res.status(200).json({ error: false, code:200, message: 'Deck name updated' });
@@ -109,17 +109,31 @@ const editMyDeckName = async (req, res, next) => {
 
 const updateCardQuantity = async (req, res, next) => {
     try {
-        console.log('edit deck try');
-          // クライアントからのリクエストから必要な情報を取得
-          const { id_deck, action } = req.body;
+          const updateCardQuantityParams = [req.body.id_deck, req.body.action];
 
-          // データベースの操作を行う（例：カードの数量を増やす）
           if (action === 'increase') {
-              // カードの数量を増やす処理
+              const increaseQuantity = `
+              UPDATE magydeck.deckCard
+              SET quantity = quantity + 1
+              WHERE id_deck = ?
+              `;
+              await pool.query(increaseQuantity, updateCardQuantityParams);
+              
           } else if (action === 'decrease') {
-              // カードの数量を減らす処理
+            const decreaseQuantity = `
+              UPDATE magydeck.deckCard
+              SET quantity = quantity - 1
+              WHERE id_deck = ?
+              `;
+              await pool.query(decreaseQuantity, updateCardQuantityParams);
+
           } else if (action === 'delete') {
-              // カードを削除する処理
+            const deleteDeckCard = `
+              DELETE FROM magydeck.deckCard
+              JOIN card ON deckCard.id_card = card.id_card 
+              WHERE id_deck = ? id_card = ?
+              `;
+              await pool.query(deleteDeckCard, updateCardQuantityParams);
           }
   
     } catch {
@@ -127,13 +141,68 @@ const updateCardQuantity = async (req, res, next) => {
     }
 }
 
+
+
 const mySharedDeck = async (req, res, next) => {
     try {
-        console.log('share deck try');
-    } catch {
-        console.log('share deck catch');
+        const id_deck = req.params.id_deck;
+        
+        const getCurrentShareStatus = `SELECT share FROM magydeck.deck WHERE id_deck = ?`;
+        const [shareStatusResult] = await pool.query(getCurrentShareStatus, [id_deck]);
+
+
+        if(shareStatusResult.length > 0){
+            const newShareStatus = shareStatusResult[0].share === 1 ? 0 : 1; // cuando share es 1, cambia a 0, cuando es 0, cambia a 1
+            const updatedShareStatus = `
+            UPDATE magydeck.deck
+            SET share = ?
+            WHERE id_deck = ?;
+            `;
+            await pool.query(updatedShareStatus, [newShareStatus, id_deck]);
+
+            const [updatedShareStatusResult] = await pool.query(getCurrentShareStatus, [id_deck]);
+            console.log('updated status: ', updatedShareStatusResult[0].share); // updated status
+
+            const message = newShareStatus === 1 ? 'Ahora está compartido' : 'Ahora está privado';
+        
+            res.json({ error: false, code:200, message: message, shareStatus: newShareStatus });
+        } else {
+            res.status(404).json({ error: true, code:404, message: "Deck not found" });
+        }
+
+    } catch (error) {
+        res.status(500).json({ error: true, code:500, message: "Server error", error: error.message });
     }
 }
+
+// const mySharedDeck = async (req, res, next) => {
+//     try {
+//         const shareDeckParams = req.params.id_deck;
+        
+//         const getCurrentShareStatus = `SELECT share FROM magydeck.deck WHERE id_deck = ?`;
+//         const shareStatusResult = await pool.query(getCurrentShareStatus, [shareDeckParams]);
+
+//         if(shareStatusResult.length > 0){
+//             const newShareStatus = shareStatusResult[0].share === 1 ? 0 : 1;
+//             const updatedShareStatus = `
+//             UPDATE magydeck.deck
+//             SET share = ?
+//             WHERE id_deck = ?
+//         `;
+//         await pool.query(updatedShareStatus, [newShareStatus, shareDeckParams]);
+
+//         const message = newShareStatus === 1 ? 'Ahora está compartido' : 'Ahora está privado';
+        
+//             res.json({ error: false, code:200, message: message, shareStatus: newShareStatus });
+
+//         }
+
+
+//     } catch (error) {
+//         res.status(500).json({ error: true, code:500, message: "Server error", error: error.message });
+
+//     }
+// }
 
 
 module.exports = {
