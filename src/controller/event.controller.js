@@ -1,5 +1,6 @@
 //const { connection } =  require('../database');
 const {pool} = require("../database");
+const { format } = require('date-fns');
 const Evento = require("../models/evento");
 const User = require("../models/user");
 const Response = require("../models/response");
@@ -18,6 +19,11 @@ const getAllEvents = async (req, res, next) => {
 
     try {
         let [result] = await pool.query(sql_AllEvents);
+        result.forEach(evento => {
+            evento.date = format(new Date(evento.date), 'yyyy-MM-dd')
+            evento.hour = evento.hour.slice(0, 5); 
+        });
+        console.log(result);
 
         //Generamos el objeto que devemos devolver
         for(let i=0; i<result.length; i++){
@@ -45,6 +51,12 @@ const getMyEvents = async (req, res, next) => {
 
     try {
         let [result] = await pool.query(sql_AllEvents,[req.params.id_user]);
+        console.log(result);
+        result.forEach(evento => {
+            evento.date = format(new Date(evento.date), 'yyyy-MM-dd')
+            evento.hour = evento.hour.slice(0, 5); 
+        });
+
         //Generamos el objeto que devemos devolver
         for(let i=0; i<result.length; i++){
             let event = {"id":result[i].id_event,"title":result[i].nameEvent,"date":result[i].date, "hour":result[i].hour, "place":result[i].place,"descriptionEvent":result[i].descriptionEvent, "direction":result[i].direction, "creator":{"id_user":result[i].id_user, "nameUser":result[i].nameUser, "avatar":result[i].avatar}};

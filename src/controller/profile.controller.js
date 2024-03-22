@@ -82,7 +82,7 @@ const putAvatar = async (req, res, next) => {
         let [result] = await pool.query(putProfile, params)
         
         if(result.changedRows == 0){
-            respuesta = {error:true, codigo: 200, mensaje: 'No se han detectado cambios en la contraseña'};
+            respuesta = {error:true, codigo: 200, mensaje: 'No se han detectado cambios'};
         } else {
             respuesta = {error:false, codigo: 200, mensaje: 'Datos modificados correctamente', data: result};
         }

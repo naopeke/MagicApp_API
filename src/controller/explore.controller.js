@@ -121,7 +121,7 @@ const getDeckById = async (req, res, next) => {
 
         let [result] = await pool.query(deckById, [id_deck])
             if(result.length == 0){
-                respuesta = {error: true, codigo: 200, mensaje: 'No se ha encontrado el mazo'}
+                respuesta = {error: true, codigo: 200, mensaje: 'Este mazo no contiene cartas'}
             } else {
                     // usar async dentro de callback para hacer que la función sea asíncrona 
                     let cardId = result[0].cards.map(async(card) =>{
