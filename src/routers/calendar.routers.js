@@ -2,13 +2,15 @@ const { Router } = require ('express');
 const router = Router();
 const calendarCtrl = require('../controller/calendar.controller');
 
-router.get('/calendario/?:id_user', calendarCtrl.getAllEvents);
+router.get('/calendario/:id_user', calendarCtrl.getAllUserEvents);
 
-router.post('/calendario', calendarCtrl.addMyEvent);
+router.get('/calendario/:id_user/:date', calendarCtrl.getUserEventsForDate);
 
-router.put('/calendario', calendarCtrl.editEventParticipation);
+// router.post('/calendario', calendarCtrl.addMyEvent);
 
-router.delete('/calendario', calendarCtrl.deleteMyEvent);
+// router.put('/calendario', calendarCtrl.editEventParticipation);
+
+// router.delete('/calendario', calendarCtrl.deleteMyEvent);
 
 
 
@@ -16,7 +18,6 @@ router.delete('/calendario', calendarCtrl.deleteMyEvent);
 // router.get('/calendario, ) saber eventos tanto true como false en participation 
 // router.post('/calendario, ) añadir evento indicando mi id_user
   // parametro de la funcion (id_user, Event) por body
-// router.put('/calendario, ) modificar p<rticipacion del evento(pasar participation a false)
-// router.delete('/calendario, ) eliminar evento solo mi id_user de loggin coincide con del creador
+
 
 module.exports = router;

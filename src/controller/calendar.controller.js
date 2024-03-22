@@ -1,41 +1,104 @@
 const { pool } =  require('../database');
+const { format } = require('date-fns');
 
-const getAllEvents = async (req, res, next) => {
-    try {
-        console.log('get cards try');
-    } catch {
-        console.log('get cards catch');
+const getAllUserEvents = async(req, res) => {
+    let respuesta;
+    try{
+        let id_user = req.params.id_user
+
+        let getEvents = `SELECT userEvent.id_user, magydeck.evento.*
+        FROM magydeck.userEvent
+        JOIN magydeck.evento ON (userEvent.id_event = evento.id_event)
+        WHERE userEvent.id_user = ? 
+        ORDER BY evento.date ASC`
+
+        let [result] = await pool.query(getEvents, id_user)
+        result.forEach(evento => {
+            evento.date = format(new Date(evento.date), 'yyyy-MM-dd')
+            evento.hour = evento.hour.slice(0, 5); 
+        });
+        console.log(result);
+
+        if(result.length == 0){
+            respuesta = {error: true, codigo: 200, mensaje: 'No se han encontrado eventos próximos en los que participes'}
+        }else{
+            respuesta = {error: false, codigo: 200, mensaje: 'Eventos recuperados', data: result}
+        }
+        
+        res.json(respuesta)
+        
+    }
+    catch (error){
+        console.error(`Error: ${error}`);
     }
 }
 
-const addMyEvent = async (req, res, next) => {
-    try {
-        console.log('add cards try');
-    } catch {
-        console.log('add cards catch');
+
+const getUserEventsForDate = async(req, res) => {
+    let respuesta;
+    try{
+        let id_user = req.params.id_user;
+        let date = req.params.date; 
+
+        let getEvents = `SELECT userEvent.id_user, magydeck.evento.*
+        FROM magydeck.userEvent
+        JOIN magydeck.evento ON (userEvent.id_event = evento.id_event)
+        WHERE userEvent.id_user = ? 
+        AND evento.date = ?
+        ORDER BY evento.date ASC`
+
+        let [result] = await pool.query(getEvents, [id_user, date])
+        result.forEach(evento => {
+            evento.date = format(new Date(evento.date), 'yyyy-MM-dd')
+            evento.hour = evento.hour.slice(0, 5); 
+        });
+        console.log(result);
+
+        if(result.length == 0){
+            respuesta = {error: true, codigo: 200, mensaje: 'No se han encontrado eventos próximos en los que participes'}
+        }else{
+            respuesta = {error: false, codigo: 200, mensaje: 'Eventos recuperados', data: result}
+        }
+        
+        res.json(respuesta)
+        
+    }
+    catch (error){
+        console.error(`Error: ${error}`);
     }
 }
 
-const editEventParticipation = async (req, res, next) => {
-    try {
-        console.log('add cards try');
-    } catch {
-        console.log('add cards catch');
-    }
-}
 
-const deleteMyEvent = async (req, res, next) => {
-    try {
-        console.log('add cards try');
-    } catch {
-        console.log('add cards catch');
-    }
-}
+
+// const addMyEvent = async (req, res, next) => {
+//     try {
+//         console.log('add cards try');
+//     } catch {
+//         console.log('add cards catch');
+//     }
+// }
+
+// const editEventParticipation = async (req, res, next) => {
+//     try {
+//         console.log('add cards try');
+//     } catch {
+//         console.log('add cards catch');
+//     }
+// }
+
+// const deleteMyEvent = async (req, res, next) => {
+//     try {
+//         console.log('add cards try');
+//     } catch {
+//         console.log('add cards catch');
+//     }
+// }
 module.exports = {
-    getAllEvents,
-    addMyEvent,
-    editEventParticipation,
-    deleteMyEvent
+    getAllUserEvents,
+    getUserEventsForDate, 
+    // addMyEvent,
+    // editEventParticipation,
+    // deleteMyEvent
 };
 
 
