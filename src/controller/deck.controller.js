@@ -109,13 +109,13 @@ const editMyDeckName = async (req, res, next) => {
 
 const updateCardQuantity = async (req, res, next) => {
     try {
-          const updateCardQuantityParams = [req.body.id_deck, req.body.action];
+          const updateCardQuantityParams = [req.body.id_deckCard, req.body.action];
 
           if (action === 'increase') {
               const increaseQuantity = `
               UPDATE magydeck.deckCard
               SET quantity = quantity + 1
-              WHERE id_deck = ?
+              WHERE id_deckCard = ?
               `;
               await pool.query(increaseQuantity, updateCardQuantityParams);
               
@@ -123,7 +123,7 @@ const updateCardQuantity = async (req, res, next) => {
             const decreaseQuantity = `
               UPDATE magydeck.deckCard
               SET quantity = quantity - 1
-              WHERE id_deck = ?
+              WHERE id_deckCard = ?
               `;
               await pool.query(decreaseQuantity, updateCardQuantityParams);
 
@@ -131,7 +131,7 @@ const updateCardQuantity = async (req, res, next) => {
             const deleteDeckCard = `
               DELETE FROM magydeck.deckCard
               JOIN card ON deckCard.id_card = card.id_card 
-              WHERE id_deck = ? id_card = ?
+              WHERE id_deckCard = ?
               `;
               await pool.query(deleteDeckCard, updateCardQuantityParams);
           }
@@ -175,34 +175,6 @@ const mySharedDeck = async (req, res, next) => {
     }
 }
 
-// const mySharedDeck = async (req, res, next) => {
-//     try {
-//         const shareDeckParams = req.params.id_deck;
-        
-//         const getCurrentShareStatus = `SELECT share FROM magydeck.deck WHERE id_deck = ?`;
-//         const shareStatusResult = await pool.query(getCurrentShareStatus, [shareDeckParams]);
-
-//         if(shareStatusResult.length > 0){
-//             const newShareStatus = shareStatusResult[0].share === 1 ? 0 : 1;
-//             const updatedShareStatus = `
-//             UPDATE magydeck.deck
-//             SET share = ?
-//             WHERE id_deck = ?
-//         `;
-//         await pool.query(updatedShareStatus, [newShareStatus, shareDeckParams]);
-
-//         const message = newShareStatus === 1 ? 'Ahora está compartido' : 'Ahora está privado';
-        
-//             res.json({ error: false, code:200, message: message, shareStatus: newShareStatus });
-
-//         }
-
-
-//     } catch (error) {
-//         res.status(500).json({ error: true, code:500, message: "Server error", error: error.message });
-
-//     }
-// }
 
 
 module.exports = {
