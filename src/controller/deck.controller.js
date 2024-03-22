@@ -14,8 +14,8 @@ const axios = require('axios');
 
 const getMyDecksWithData = async (req, res, next) => {
     try {
-        const userId = req.params.id_user;
-        const getMyDecksWithDataQuery = `
+        const userId = [req.params.id_user];
+        const getMyDecksWithData = `
             SELECT deck.id_deck, deck.indexDeck, deck.nameDeck, deck.share, deckCard.id_card, card.id, deckCard.quantity 
             FROM magydeck.deck 
             LEFT JOIN magydeck.deckCard ON deck.id_deck = deckCard.id_deck
@@ -25,7 +25,7 @@ const getMyDecksWithData = async (req, res, next) => {
         `;
         //LEFT JOIN para que salga datos sin cartas
 
-        const [getMyDecksWithDataResult] = await pool.query(getMyDecksWithDataQuery, userId);
+        const [getMyDecksWithDataResult] = await pool.query(getMyDecksWithData, userId);
 
         const decksMap = new Map(); // Usar Map con key: id_deck
 
@@ -53,7 +53,8 @@ const getMyDecksWithData = async (req, res, next) => {
                 //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/get
 
                 // si existe element con key:id_deck, devuelve boolean
-                if (decksMap.has(deck.id_deck)) {
+                if (decksMap.has(deck.id_deck)) 
+                {
 
                     // obtener el valor
                     decksMap.get(deck.id_deck).cards.push(cardData);
@@ -70,10 +71,13 @@ const getMyDecksWithData = async (req, res, next) => {
                 }
                 
             } catch (err) {
-                console.log('Error fetching card data:', deck.id_card, err);
+                console.log('Error fetching card data:', deck.id_card, deck.id, err);
+                // cuando no hay datos de id_card, id en deck table, o id no es correcto, sale error desde axios
             }
         }
 
+        //decksMap.values(): devolver todos los valores como nuevo map iterator https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/values
+        //Array.from(): cambiar a un Array https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from
         const decks = Array.from(decksMap.values());
         res.json(decks);
    
@@ -83,14 +87,23 @@ const getMyDecksWithData = async (req, res, next) => {
     }
 };
 
-
-
+ 
 
 const editMyDeckName = async (req, res, next) => {
     try {
+
+        const editDeckNameParams = [req.body.nameDeck, req.params.id_deck]
+        const editDeckName = `
+        UPDATE magydeck.deck
+        SET nameDeck = COALESCE(?, nameDeck)
+        WHERE id_deck = ?;
+        `;
+        await pool.query(editDeckName, editDeckNameParams);
         console.log('edit deck name try');
+        res.status(200).json({ error: false, code:200, message: 'Deck name updated' });
+
     } catch {
-        console.log('edit deck name catch');
+        res.status(500).json({ error: true, message: 'Failed to update deck name' });
     }
 }
 
