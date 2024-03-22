@@ -10,7 +10,7 @@ router.get('/mis-mazos/:id_user', deckCtrl.getMyDecksWithData);
 
 router.put('/mis-mazos/:id_deck', deckCtrl.editMyDeckName);
 
-router.put('/mis-mazos', deckCtrl.editMyDeck);
+router.put('/mis-mazos/quantity', deckCtrl.updateCardQuantity);
 
 router.put('/mis-mazos/compartir', deckCtrl.mySharedDeck);
 

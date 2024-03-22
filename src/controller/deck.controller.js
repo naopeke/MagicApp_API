@@ -107,11 +107,11 @@ const editMyDeckName = async (req, res, next) => {
     }
 }
 
-const editMyDeck = async (req, res, next) => {
+const updateCardQuantity = async (req, res, next) => {
     try {
         console.log('edit deck try');
           // クライアントからのリクエストから必要な情報を取得
-          const { cardId, action } = req.body;
+          const { id_deck, action } = req.body;
 
           // データベースの操作を行う（例：カードの数量を増やす）
           if (action === 'increase') {
@@ -140,6 +140,6 @@ module.exports = {
     // getMyDeckById,
     getMyDecksWithData,
     editMyDeckName,
-    editMyDeck,
+    updateCardQuantity,
     mySharedDeck
 };
