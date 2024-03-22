@@ -3,23 +3,12 @@ const router = Router();
 const eventCtrl = require('../controller/event.controller');
 
 router.get('/eventos', eventCtrl.getAllEvents);
-
 router.get('/eventos/?:id_user', eventCtrl.getMyEvents);
-
 router.get('/eventos/?:id_event', eventCtrl.getMyEvents);
-
-// router.get('/eventos/', eventCtrl.getOthersEvents); // hay que cambiar endpoint
-
 router.post('/eventos', eventCtrl.addMyEvent);
-
 router.put('/eventos', eventCtrl.editMyEvent);
-
 router.put('/eventos/detalle', eventCtrl.editParticipation);
-//belu
-
-router.delete('/eventos', eventCtrl.deleteMyEvent);
-
-
+router.delete('/eventos', eventCtrl.deleteMyEvent);//belu
 
 
 // *NOTE - EVENTOS
