@@ -16,7 +16,7 @@ const getMyDecksWithData = async (req, res, next) => {
     try {
         const userId = [req.params.id_user];
         const getMyDecksWithData = `
-            SELECT deck.id_deck, deck.indexDeck, deck.nameDeck, deck.share, deckCard.id_card, card.id, deckCard.quantity 
+            SELECT deck.id_deck, deck.indexDeck, deck.nameDeck, deck.share, deckCard.id_card, card.id, deckCard.id_deckCard, deckCard.quantity 
             FROM magydeck.deck 
             LEFT JOIN magydeck.deckCard ON deck.id_deck = deckCard.id_deck
             LEFT JOIN magydeck.card ON deckCard.id_card = card.id_card 
@@ -35,6 +35,7 @@ const getMyDecksWithData = async (req, res, next) => {
                 const cardData = {
                     id_card: deck.id_card,
                     id: deck.id,
+                    id_deckCard: deck.id_deckCard,
                     image_uris: response.data.image_uris.normal,
                     name: response.data.name,
                     printed_name: response.data.printed_name,
@@ -109,7 +110,8 @@ const editMyDeckName = async (req, res, next) => {
 
 const updateCardQuantity = async (req, res, next) => {
     try {
-          const updateCardQuantityParams = [req.body.id_deckCard, req.body.action];
+
+          const updateCardQuantityParams = [req.params.id_deckCard, req.body.action];
 
           if (action === 'increase') {
               const increaseQuantity = `
