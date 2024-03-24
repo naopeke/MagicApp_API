@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const routers = require('./routers/routers');
+const calendarRouters = require('./routers/calendar.routers.js');
 const cardRouters = require('./routers/card.routers');
 const deckRouters = require('./routers/deck.routers');
 const eventRouters = require('./routers/event.routers');
@@ -18,6 +19,7 @@ app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(routers);
+app.use(calendarRouters);
 app.use(cardRouters);
 app.use(deckRouters);
 app.use(eventRouters);
