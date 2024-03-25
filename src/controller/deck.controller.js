@@ -120,19 +120,31 @@ const updateCardQuantity = async (req, res, next) => {
               WHERE id_deckCard = ?
               `;
               await pool.query(decreaseQuantity, id_deckCard);
-
-          } else if (action === 'delete') {
-            const deleteDeckCard = `
-              DELETE FROM magydeck.deckCard
-              JOIN card ON deckCard.id_card = card.id_card 
-              WHERE id_deckCard = ?
-              `;
-              await pool.query(deleteDeckCard, id_deckCard);
           }
           res.json({ error: false, code: 200, message: 'Quantity updated' });
   
-    } catch {
+    } catch (err) {
+        console.log('Error :', err);
         res.status(500).json({error: true, code: 500, message: 'Server error'});
+    }
+}
+
+
+
+const deleteCardsQuantity = async (req, res, next) => {
+    try {
+        const id_deckCard = [req.params.id_deckCard];
+        const deleteDeckCard = `
+        DELETE deckCard FROM magydeck.deckCard
+        JOIN magydeck.card ON deckCard.id_card = card.id_card 
+        WHERE deckCard.id_deckCard = ?
+        `;
+        await pool.query(deleteDeckCard, id_deckCard);
+
+        res.json({ error: false, code: 200, message: 'Card deleted' });
+    } catch (err) {
+        console.log('Error :', err);
+        res.status(500).json({ error: true, code: 500, message: 'Server error' });
     }
 }
 
@@ -175,5 +187,6 @@ module.exports = {
     getMyDecksWithData,
     editMyDeckName,
     updateCardQuantity,
+    deleteCardsQuantity,
     mySharedDeck
 };

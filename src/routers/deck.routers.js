@@ -10,5 +10,7 @@ router.put('/mis-mazos/cantidad/:id_deckCard', deckCtrl.updateCardQuantity);
 
 router.put('/mis-mazos/compartir/:id_deck', deckCtrl.mySharedDeck);
 
+router.delete('/mis-mazos/cantidad/:id_deckCard', deckCtrl.deleteCardsQuantity);
+
 
 module.exports = router;
