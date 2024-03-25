@@ -6,11 +6,17 @@ const getMyEvents = async(req, res) => {
     try{
         let params = req.params.id_user
 
-        let getEvents = `SELECT userEvent.id_user, magydeck.evento.*
+        let getEvents = `SELECT userEvent.id_user, magydeck.evento.*, avatarCreador.avatar AS avatar
         FROM magydeck.userEvent
         JOIN magydeck.evento ON (userEvent.id_event = evento.id_event)
-        WHERE userEvent.id_user = ? 
-        ORDER BY evento.date ASC LIMIT 3`
+        JOIN 
+            (SELECT userEvent.id_event, user.avatar
+            FROM magydeck.userEvent
+            JOIN magydeck.user ON (userEvent.id_user = user.id_user)
+            WHERE userEvent.creator = 1) AS avatarCreador 
+            ON (userEvent.id_event = avatarCreador.id_event)
+        WHERE userEvent.id_user = ? AND evento.date >= CURDATE() 
+        ORDER BY evento.date ASC LIMIT 3;`
 
         let [result] = await pool.query(getEvents, params)
   
@@ -18,7 +24,6 @@ const getMyEvents = async(req, res) => {
             evento.date = format(new Date(evento.date), 'yyyy-MM-dd')
             evento.hour = evento.hour.slice(0, 5); 
         });
-        console.log(result);
 
         if(result.length == 0){
             respuesta = {error: true, codigo: 200, mensaje: 'No se han encontrado eventos próximos en los que participes'}
@@ -43,7 +48,7 @@ const getEventsCommunity = async(req, res) => {
         FROM magydeck.evento
         JOIN magydeck.userEvent ON (evento.id_event = userEvent.id_event)
         JOIN magydeck.user ON (userEvent.id_user = user.id_user)
-        WHERE creator = 1 AND userEvent.id_event NOT IN(
+        WHERE creator = 1 AND evento.date >= CURDATE() AND userEvent.id_event NOT IN(
             SELECT id_event
             FROM userEvent
             WHERE id_user = ?)
