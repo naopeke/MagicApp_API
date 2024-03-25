@@ -30,17 +30,17 @@ const getDeck = async (req, res, next) => {
         let params; 
         let deck;
         if (req.query.nameUser){
-            params = req.query.nameUser
+            params = '%' + req.query.nameUser + '%';
             
             deck = `SELECT user.nameUser, ROUND((sumScores/nScores),1) AS mediaScore, magydeck.deck.* FROM magydeck.deck
             JOIN user ON (deck.id_user = user.id_user)
-            WHERE share = 1 AND user.nameUser = ?`
+            WHERE share = 1 AND user.nameUser LIKE ?`
 
         } else if (req.query.nameDeck){
-            params = req.query.nameDeck
+            params = '%' + req.query.nameDeck + '%';
             deck = `SELECT user.nameUser, ROUND((sumScores/nScores),1) AS mediaScore, magydeck.deck.* FROM magydeck.deck
             JOIN user ON (deck.id_user = user.id_user)
-            WHERE share = 1 AND deck.nameDeck = ?`
+            WHERE share = 1 AND deck.nameDeck LIKE ?`
         } else {
             params = null
 
