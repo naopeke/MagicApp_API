@@ -102,11 +102,9 @@ const editMyDeckName = async (req, res, next) => {
 
 const updateCardQuantity = async (req, res, next) => {
     try {
-
           const id_deckCard = [req.params.id_deckCard];
           const action = req.body.action;
           
-
           if (action === 'increase') {
               const increaseQuantity = `
               UPDATE magydeck.deckCard
@@ -146,7 +144,6 @@ const mySharedDeck = async (req, res, next) => {
         
         const getCurrentShareStatus = `SELECT share FROM magydeck.deck WHERE id_deck = ?`;
         const [shareStatusResult] = await pool.query(getCurrentShareStatus, [id_deck]);
-
 
         if(shareStatusResult.length > 0){
             const newShareStatus = shareStatusResult[0].share === 1 ? 0 : 1; // cuando share es 1, cambia a 0, cuando es 0, cambia a 1
