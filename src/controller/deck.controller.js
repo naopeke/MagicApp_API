@@ -1,16 +1,6 @@
 const { pool } =  require('../database');
 const axios = require('axios');
 
-//* get id_deck, indexDeck, nameDeck, id_card, id, share, quantity
-// SELECT deck.id_deck, deck.indexDeck, deck.nameDeck, card.id_card, card.id, deck.share, deckCard.quantity 
-// FROM magydeck.deck 
-// JOIN magydeck.deckCard ON deck.id_deck = deckCard.id_deck 
-// JOIN magydeck.card ON deckCard.id_card = card.id_card 
-// WHERE id_user = 13 
-// ORDER BY deck.id_deck ASC, deck.indexDeck ASC;
-
-
-
 
 const getMyDecksWithData = async (req, res, next) => {
     try {
@@ -108,10 +98,14 @@ const editMyDeckName = async (req, res, next) => {
     }
 }
 
+
+
 const updateCardQuantity = async (req, res, next) => {
     try {
 
-          const updateCardQuantityParams = [req.params.id_deckCard, req.body.action];
+          const id_deckCard = [req.params.id_deckCard];
+          const action = req.body.action;
+          
 
           if (action === 'increase') {
               const increaseQuantity = `
@@ -119,7 +113,7 @@ const updateCardQuantity = async (req, res, next) => {
               SET quantity = quantity + 1
               WHERE id_deckCard = ?
               `;
-              await pool.query(increaseQuantity, updateCardQuantityParams);
+              await pool.query(increaseQuantity, id_deckCard);
               
           } else if (action === 'decrease') {
             const decreaseQuantity = `
@@ -127,7 +121,7 @@ const updateCardQuantity = async (req, res, next) => {
               SET quantity = quantity - 1
               WHERE id_deckCard = ?
               `;
-              await pool.query(decreaseQuantity, updateCardQuantityParams);
+              await pool.query(decreaseQuantity, id_deckCard);
 
           } else if (action === 'delete') {
             const deleteDeckCard = `
@@ -135,11 +129,12 @@ const updateCardQuantity = async (req, res, next) => {
               JOIN card ON deckCard.id_card = card.id_card 
               WHERE id_deckCard = ?
               `;
-              await pool.query(deleteDeckCard, updateCardQuantityParams);
+              await pool.query(deleteDeckCard, id_deckCard);
           }
+          res.json({ error: false, code: 200, message: 'Quantity updated' });
   
     } catch {
-        console.log('edit deck catch');
+        res.status(500).json({error: true, code: 500, message: 'Server error'});
     }
 }
 
@@ -180,7 +175,6 @@ const mySharedDeck = async (req, res, next) => {
 
 
 module.exports = {
-    // getMyDeckById,
     getMyDecksWithData,
     editMyDeckName,
     updateCardQuantity,
