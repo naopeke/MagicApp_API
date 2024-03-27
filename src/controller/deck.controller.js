@@ -1,84 +1,89 @@
 const { pool } =  require('../database');
 const axios = require('axios');
 
-
 const getMyDecksWithData = async (req, res, next) => {
     try {
         const userId = [req.params.id_user];
-        const getMyDecksWithData = `
-            SELECT deck.id_deck, deck.indexDeck, deck.nameDeck, deck.share, deckCard.id_card, card.id, deckCard.id_deckCard, deckCard.quantity 
-            FROM magydeck.deck 
-            LEFT JOIN magydeck.deckCard ON deck.id_deck = deckCard.id_deck
-            LEFT JOIN magydeck.card ON deckCard.id_card = card.id_card 
-            WHERE id_user = ? 
-            ORDER BY deck.id_deck ASC, deck.indexDeck ASC;
+        const getDecks = `
+            SELECT id_deck, indexDeck, nameDeck, share
+            FROM magydeck.deck
+            WHERE id_user = ?
+            ORDER BY id_deck ASC, indexDeck ASC;
         `;
-        //LEFT JOIN para que salga datos sin cartas
+        const [decksResult] = await pool.query(getDecks, userId);
 
-        const [getMyDecksWithDataResult] = await pool.query(getMyDecksWithData, userId);
+        // crear Map object para key (guardar deck info y lista de cards)
+        const decksMap = new Map();
 
-        const decksMap = new Map(); // Usar Map con key: id_deck
+        for (const deck of decksResult) {
+            const getCards = `
+                SELECT deckCard.id_card, card.id, deckCard.id_deckCard, deckCard.quantity
+                FROM magydeck.deckCard
+                LEFT JOIN magydeck.card ON deckCard.id_card = card.id_card
+                WHERE deckCard.id_deck = ?
+            `;
+            //LEFT JOIN para que salga datos sin cartas
+            
+            const [cardsResult] = await pool.query(getCards, [deck.id_deck]);
 
-        for (const deck of getMyDecksWithDataResult) {
-            try {
-                const response = await axios.get(`https://api.scryfall.com/cards/${deck.id}`);
-                const cardData = {
-                    id_card: deck.id_card,
-                    id: deck.id,
-                    id_deckCard: deck.id_deckCard,
-                    image_uris: response.data.image_uris.normal,
-                    name: response.data.name,
-                    printed_name: response.data.printed_name,
-                    type_line: response.data.type_line,
-                    oracle_text: response.data.oracle_text,
-                    printed_text: response.data.printed_text,
-                    color_identity: response.data.color_identity,
-                    legalities: response.data.legalities,
-                    set_name: response.data.set_name,
-                    set_type: response.data.set_type,
-                    prices: response.data.prices ? response.data.prices.eur : null,
-                    quantity: deck.quantity
-                };
-
-                //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/has
-                //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/get
-
-                // si existe element con key:id_deck, devuelve boolean
-                if (decksMap.has(deck.id_deck)) 
-                {
-
-                    // obtener el valor
-                    decksMap.get(deck.id_deck).cards.push(cardData);
+            // axios.get es asynchronous request asi que entero es async
+            // Promise.all() https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
+                //cuando termina todas las promesas, devuelve una promesa
+                // asyncronous a cardsResult todos, y resultado es cardsData
+            const cardsData = await Promise.all(cardsResult.map(async (card) => {
+                if (card.id) {
+                    try {
+                        const response = await axios.get(`https://api.scryfall.com/cards/${card.id}`);
+                        return {
+                            // copiar los siguientes datos para crear nuevo object
+                            ...card,
+                            image_uris: response.data.image_uris.normal,
+                            name: response.data.name,
+                            printed_name: response.data.printed_name,
+                            type_line: response.data.type_line,
+                            oracle_text: response.data.oracle_text,
+                            printed_text: response.data.printed_text,
+                            color_identity: response.data.color_identity,
+                            legalities: response.data.legalities,
+                            set_name: response.data.set_name,
+                            set_type: response.data.set_type,
+                            prices: response.data.prices ? response.data.prices.eur : null,
+                        };
+                    } catch (error) {
+                        console.log('Error fetching card data for ID:', card.id, error);
+                    }
                 } else {
-
-                    // si boolean es false, añadir key y object al Map
-                    decksMap.set(deck.id_deck, {
-                        id_deck: deck.id_deck,
-                        indexDeck: deck.indexDeck,
-                        nameDeck: deck.nameDeck,
-                        share: deck.share,
-                        cards: [cardData]
-                    });
+                    // cuando dato es null, devuelve también y hacer nuevo object
+                    return { ...card, id_card: null, id: null };
                 }
-                
-            } catch (err) {
-                console.log('Error fetching card data:', deck.id_card, deck.id, err);
-                // cuando no hay datos de id_card, id en deck table, o id no es correcto, sale error desde axios
-            }
+            }));
+
+            //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/has
+            //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/get
+            //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/set
+            //añadir key y object al Map : Deck info y lista de cards
+            decksMap.set(deck.id_deck, {
+                id_deck: deck.id_deck,
+                indexDeck: deck.indexDeck,
+                nameDeck: deck.nameDeck,
+                share: deck.share,
+                cards: cardsData
+            });
         }
 
         //decksMap.values(): devolver todos los valores como nuevo map iterator https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/values
         //Array.from(): cambiar a un Array https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from
         const decks = Array.from(decksMap.values());
+        // mandar como json
         res.json(decks);
-   
+
     } catch (error) {
         console.log('Error getting decks data:', error);
         res.status(500).json({ error: true, code: 500, message: 'Server error' });
     }
 };
 
- 
+
 
 const editMyDeckName = async (req, res, next) => {
     try {
@@ -94,7 +99,7 @@ const editMyDeckName = async (req, res, next) => {
         res.status(200).json({ error: false, code:200, message: 'Deck name updated' });
 
     } catch {
-        res.status(500).json({ error: true, message: 'Failed to update deck name' });
+        res.status(500).json({ error: true, code:500, message: 'Failed to update deck name' });
     }
 }
 
@@ -169,7 +174,7 @@ const mySharedDeck = async (req, res, next) => {
             const [updatedShareStatusResult] = await pool.query(getCurrentShareStatus, [id_deck]);
             console.log('updated status: ', updatedShareStatusResult[0].share); // updated status
 
-            const message = newShareStatus === 1 ? 'Ahora está compartido' : 'Ahora está privado';
+            const message = newShareStatus === 1 ? 'Ahora este mazo está compartido' : 'Ahora este mazo está privado';
         
             res.json({ error: false, code:200, message: message, shareStatus: newShareStatus });
         } else {

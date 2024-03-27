@@ -96,8 +96,23 @@ const addCardsToDeck = async (req, res, next) => {
     }
 };
 
+fetchCardSymbolsData = async (req, res, next) => {
+    try {
+        const response = await axios.get('https://api.scryfall.com/symbology');
+        const cardSymbolsData = response.data.data.map(symbol => ({
+            symbol: symbol.symbol,
+            svg_uri: symbol.svg_uri
+        }));
+        res.json(cardSymbolsData); // mandar en formato json
+    } catch (err) {
+        console.log('Error fetching', err);
+        res.status(500).json({error: true, code: 500, message: 'Error fetching card data'});
+    }
+
+}
 
 module.exports = {
     fetchCardData,
-    addCardsToDeck
+    addCardsToDeck,
+    fetchCardSymbolsData
 };
