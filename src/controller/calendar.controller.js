@@ -6,7 +6,7 @@ const getAllUserEvents = async(req, res) => {
     try{
         let id_user = req.params.id_user
 
-        let getEvents = `SELECT userEvent.id_user, magydeck.evento.*
+        let getEvents = `SELECT userEvent.id_user, userEvent.creator, magydeck.evento.*
         FROM magydeck.userEvent
         JOIN magydeck.evento ON (userEvent.id_event = evento.id_event)
         WHERE userEvent.id_user = ? 
