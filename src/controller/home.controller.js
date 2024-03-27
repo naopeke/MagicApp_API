@@ -139,21 +139,29 @@ const deleteParticipacion = async (req, res) =>{
 
         let existQuery = `SELECT * FROM  magydeck.userEvent 
         WHERE  id_user = ? AND id_event = ?`
-
         let [exist] = await pool.query(existQuery, params)
 
+        let creatorQuery = `SELECT * FROM  magydeck.userEvent 
+        WHERE  id_user = ? AND id_event = ? AND creator = 1`
+        let [creator] = await pool.query(creatorQuery, params)
+
+
         if(exist.length == 0){
+            
             respuesta = {error: true, codigo: 200, mensaje: 'No participas en el evento'}
+        } else if(creator.length > 0){
+            let postParticipacion = 'DELETE FROM magydeck.userEvent WHERE userEvent.id_event = ?'
+            let [result] = await pool.query(postParticipacion, [req.body.id_event])
+
+            let deleteQuery = `DELETE FROM magydeck.evento WHERE evento.id_event = ?`
+            let [deleteEvent] = await pool.query(deleteQuery, [req.body.id_event])
+            respuesta = {error: false, codigo: 200, mensaje: '¡Has eliminado el evento!'}
         }
         else {
             let postParticipacion = 'DELETE FROM magydeck.userEvent WHERE userEvent.id_user = ? AND userEvent.id_event = ?'
-        
-            let [result] = await pool.query(postParticipacion, params)
-            console.log([result]);
-            
+            let [result] = await pool.query(postParticipacion, params)            
             respuesta = {error: false, codigo: 200, mensaje: '¡Has abandonado el evento!'}
         }
-
         res.json(respuesta)
     }
 
