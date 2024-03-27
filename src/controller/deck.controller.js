@@ -35,8 +35,8 @@ const getMyDecksWithData = async (req, res, next) => {
                     try {
                         const response = await axios.get(`https://api.scryfall.com/cards/${card.id}`);
                         return {
-                            // copiar los siguientes datos para crear nuevo object
-                            ...card,
+                            
+                            ...card,  // copiar los siguientes datos para crear nuevo object
                             image_uris: response.data.image_uris.normal,
                             name: response.data.name,
                             printed_name: response.data.printed_name,
