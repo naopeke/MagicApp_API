@@ -30,18 +30,33 @@ const putProfile = async (req, res, next) => {
         let respuesta;
 
         let params = [req.body.nameUser, req.body.emailUser, req.body.description, req.body.id_user]
-        let putProfile =`UPDATE user 
-                SET nameUser = COALESCE(?, nameUser), 
-                    emailUser = COALESCE(?, emailUser),
-                    description = COALESCE(?, description)
-                WHERE id_user = ?`
-        let [result] = await pool.query(putProfile, params)
+
+        let existQueryName = `SELECT id_user FROM magydeck.user WHERE nameUser = ? AND id_user <> ?`
+        let [existName] = await pool.query(existQueryName, [req.body.nameUser, req.body.id_user])
         
-        if(result.changedRows == 0){
-            respuesta = {error:true, codigo: 200, mensaje: 'No se han detectado cambios'};
-        } else {
-            respuesta = {error:false, codigo: 200, mensaje: 'Datos modificados correctamente', data: result};
+        let existQueryEmail = `SELECT id_user FROM magydeck.user WHERE emailUser = ? AND id_user <> ?`
+        let [existEmail] = await pool.query(existQueryEmail, [req.body.emailUser, req.body.id_user])
+
+        if(existName.length > 0 ){
+            respuesta = {error:true, codigo: 200, mensaje: 'El nombre ya existe'};
+        } else if (existEmail.length > 0 ){
+            respuesta = {error:true, codigo: 200, mensaje: 'El correo electrónico ya existe'};
+        } 
+        else {
+            let putProfile =`UPDATE user 
+            SET nameUser = COALESCE(?, nameUser), 
+                emailUser = COALESCE(?, emailUser),
+                description = COALESCE(?, description)
+            WHERE id_user = ?`
+            let [result] = await pool.query(putProfile, params)
+            
+            if(result.changedRows == 0){
+                respuesta = {error:true, codigo: 200, mensaje: 'No se han detectado cambios'};
+            } else {
+                respuesta = {error:false, codigo: 200, mensaje: 'Datos modificados correctamente', data: result};
+            }
         }
+
         res.json(respuesta)
     } catch(error){
         console.error(`Error: ${error}`);
