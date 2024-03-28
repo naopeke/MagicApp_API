@@ -6,7 +6,7 @@ const getMyEvents = async(req, res) => {
     try{
         let params = req.params.id_user
 
-        let getEvents = `SELECT userEvent.id_user, magydeck.evento.*, avatarCreador.avatar AS avatar
+        let getEvents = `SELECT userEvent.id_user, creator AS creatorEvent, magydeck.evento.*, avatarCreador.avatar AS avatar
         FROM magydeck.userEvent
         JOIN magydeck.evento ON (userEvent.id_event = evento.id_event)
         JOIN 
@@ -80,7 +80,7 @@ const getParticipantes = async (req, res) => {
     try{
         let params = req.params.id_event
 
-        let participantes = `SELECT userEvent.id_user, user.nameUser, userEvent.id_event, userEvent.creator FROM magydeck.userEvent
+        let participantes = `SELECT userEvent.id_user, user.nameUser, userEvent.id_event, userEvent.creator AS creatorEvent FROM magydeck.userEvent
         JOIN magydeck.user ON (userEvent.id_user = user.id_user)
         WHERE id_event = ?`
 
@@ -89,7 +89,7 @@ const getParticipantes = async (req, res) => {
         console.log(result);
 
         if(result.length == 0){
-            respuesta = {error: true, codigo: 200, mensaje: 'No se han encontrado participantes'}
+            respuesta = {error: true, codigo: 200}
         }else{
             respuesta = {error: false, codigo: 200, mensaje: 'Participantes recuperados', data: result}
         }
