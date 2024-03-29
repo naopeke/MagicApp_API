@@ -20,9 +20,7 @@ const registerUser = async (req, res, next) => {
         let sqlEmail = "SELECT emailUser from magydeck.user WHERE emailUser = '" + user.emailUser + "'";
         let [checkEmail] = await pool.query(sqlEmail);
         if(checkEmail.length){
-            respuesta.error = true;
-            respuesta.codigo = 400; 
-            respuesta.mensaje = 'Ya existe un usuario con este email';
+            res.status(400).json({error: true, codigo: 400, mensaje: 'Ya existe un usuario con este email'});
         } else {
             let sql = "INSERT INTO magydeck.user (nameUser, emailUser, passwordUser)" +
             "VALUES ('" + user.nameUser + "', '" +
