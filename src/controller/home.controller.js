@@ -26,7 +26,7 @@ const getMyEvents = async(req, res) => {
         });
 
         if(result.length == 0){
-            respuesta = {error: true, codigo: 200, mensaje: 'No se han encontrado eventos próximos en los que participes'}
+            respuesta = {error: true, codigo: 200, mensaje: 'No se han encontrado eventos próximos en los que participes', data:result}
         }else{
             respuesta = {error: false, codigo: 200, mensaje: 'Eventos recuperados', data: result}
         }
@@ -59,9 +59,6 @@ const getEventsCommunity = async(req, res) => {
             evento.date = format(new Date(evento.date), 'yyyy-MM-dd')
             evento.hour = evento.hour.slice(0, 5); 
         });
-        console.log(result);
-
-
         if(result.length == 0){
             respuesta = {error: true, codigo: 200, mensaje: 'No se han encontrado eventos de la comunidad en los que NO participes'}
         }else{
@@ -85,9 +82,6 @@ const getParticipantes = async (req, res) => {
         WHERE id_event = ?`
 
         let [result] = await pool.query(participantes, params)
-  
-        console.log(result);
-
         if(result.length == 0){
             respuesta = {error: true, codigo: 200}
         }else{
@@ -121,7 +115,6 @@ const postParticipacion = async (req, res) =>{
             console.log([result]);
             
             respuesta = {error: false, codigo: 200, mensaje: '¡Ahora participas en el evento'}
-            
         }
 
         res.json(respuesta)
