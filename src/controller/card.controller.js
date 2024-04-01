@@ -86,9 +86,9 @@ const addCardsToDeck = async (req, res, next) => {
                   console.log('New card: ', cardIdValue, 'deck_id: ', deckId, addNewCardToDeckcardResult);
 
             }
+            }
             console.log('Cards added to deck');
             res.status(200).json({ error: false, code: 200, message: 'Cards added to deck' });
-            }
         
         } catch (error) {
         console.log('Error in adding cards to deck:', error);
