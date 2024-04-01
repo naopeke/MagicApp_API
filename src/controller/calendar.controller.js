@@ -6,7 +6,7 @@ const getAllUserEvents = async(req, res) => {
     try{
         let id_user = req.params.id_user
 
-        let getEvents = `SELECT userEvent.id_user, magydeck.evento.*
+        let getEvents = `SELECT userEvent.id_user, userEvent.creator AS creatorEvent, magydeck.evento.*
         FROM magydeck.userEvent
         JOIN magydeck.evento ON (userEvent.id_event = evento.id_event)
         WHERE userEvent.id_user = ? 
@@ -20,7 +20,7 @@ const getAllUserEvents = async(req, res) => {
         console.log(result);
 
         if(result.length == 0){
-            respuesta = {error: true, codigo: 200, mensaje: 'No se han encontrado eventos próximos en los que participes'}
+            respuesta = {error: true, codigo: 200, mensaje: 'No se han encontrado eventos próximos en los que participes', data: result}
         }else{
             respuesta = {error: false, codigo: 200, mensaje: 'Eventos recuperados', data: result}
         }
@@ -40,7 +40,7 @@ const getUserEventsForDate = async(req, res) => {
         let id_user = req.params.id_user;
         let date = req.params.date; 
 
-        let getEvents = `SELECT userEvent.id_user, userEvent.creator, magydeck.evento.*
+        let getEvents = `SELECT userEvent.id_user, userEvent.creator AS creatorEvent, magydeck.evento.*
         FROM magydeck.userEvent
         JOIN magydeck.evento ON (userEvent.id_event = evento.id_event)
         WHERE userEvent.id_user = ? 

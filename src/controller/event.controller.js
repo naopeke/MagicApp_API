@@ -12,7 +12,7 @@ const getAllEvents = async (req, res, next) => {
     let sql_AllEvents = "SELECT e.*, u_creador.*"+ 
     "FROM evento e " + 
     "JOIN userEvent eu ON e.id_event = eu.id_event "+
-    "JOIN user u_creador ON eu.id_user = u_creador.id_user WHERE e.date >=CURDATE()";
+    "JOIN user u_creador ON eu.id_user = u_creador.id_user WHERE e.date >=CURDATE() AND creator = 1";
 
     let respuesta;
     let eventos=[];

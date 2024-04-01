@@ -16,7 +16,6 @@ const getProfile = async(req, res, next) => {
             respuesta = {error:true, codigo: 200, mensaje: 'No existe el usuario', data: result};
         }
        
-        console.log(result);
         res.json(respuesta);
     }
 
