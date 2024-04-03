@@ -5,14 +5,18 @@ const { format } = require('date-fns');
 const getSharedDecks = async (req, res, next) => {
     let respuesta;
     try {
-        let getShared = `SELECT user.nameUser, magydeck.deck.*, ROUND((sumScores/nScores),1) AS mediaScore FROM magydeck.deck
-        JOIN user ON (deck.id_user = user.id_user)
-        WHERE share = 1`
+        let getShared = `SELECT user.nameUser, magydeck.deck.*,ROUND(COALESCE(sumScores/nScores, 0.0),1) AS mediaScore, 
+        JSON_ARRAYAGG(JSON_OBJECT('userVotes', votos.id_user, 'date', votos.date)) AS previousScore
+         FROM magydeck.deck
+                JOIN user ON (deck.id_user = user.id_user)
+                LEFT JOIN votos ON (deck.id_deck = votos.id_deck)
+                WHERE share = 1
+                GROUP BY deck.id_deck`
 
         let [result] = await pool.query(getShared)
 
         if(result.length == 0){
-            respuesta = {error: true, codigo: 200, mensaje: 'Todavía no existen mazos compartidos, ¡animáte y comparte el tuyo!'}
+            respuesta = {error: true, codigo: 200, mensaje: 'Todavía no existen mazos compartidos, ¡animáte y comparte el tuyo!', data: result}
         } else {
             respuesta = {error: false, codigo: 200, mensaje: 'Mazos recuperados', data: result}
         }
@@ -33,19 +37,19 @@ const getDeck = async (req, res, next) => {
         if (req.query.nameUser){
             params = '%' + req.query.nameUser + '%';
             
-            deck = `SELECT user.nameUser, ROUND((sumScores/nScores),1) AS mediaScore, magydeck.deck.* FROM magydeck.deck
+            deck = `SELECT user.nameUser, ROUND(COALESCE(sumScores/nScores, 0.0),1) AS mediaScore, magydeck.deck.* FROM magydeck.deck
             JOIN user ON (deck.id_user = user.id_user)
             WHERE share = 1 AND user.nameUser LIKE ?`
 
         } else if (req.query.nameDeck){
             params = '%' + req.query.nameDeck + '%';
-            deck = `SELECT user.nameUser, ROUND((sumScores/nScores),1) AS mediaScore, magydeck.deck.* FROM magydeck.deck
+            deck = `SELECT user.nameUser, ROUND(COALESCE(sumScores/nScores, 0.0),1) AS mediaScore, magydeck.deck.* FROM magydeck.deck
             JOIN user ON (deck.id_user = user.id_user)
             WHERE share = 1 AND deck.nameDeck LIKE ?`
         } else {
             params = null
 
-            deck = `SELECT user.nameUser, ROUND((sumScores/nScores),1) AS mediaScore, magydeck.deck.* FROM magydeck.deck
+            deck = `SELECT user.nameUser, ROUND(COALESCE(sumScores/nScores, 0.0),1) AS mediaScore, magydeck.deck.* FROM magydeck.deck
             JOIN user ON (deck.id_user = user.id_user)
             WHERE share = 1`
         }
@@ -68,7 +72,7 @@ const getDeck = async (req, res, next) => {
 const getVotedDecks = async (req, res, next) => {
     let respuesta;
     try {
-        let getVoted = `SELECT user.nameUser, magydeck.deck.*, ROUND((sumScores/nScores),1) AS mediaScore FROM magydeck.deck
+        let getVoted = `SELECT user.nameUser, magydeck.deck.*, ROUND(COALESCE(sumScores/nScores, 0.0),1) AS mediaScore FROM magydeck.deck
         JOIN user ON (deck.id_user = user.id_user)
         WHERE share = 1
         ORDER BY mediaScore DESC LIMIT 3`
