@@ -57,7 +57,7 @@ const getDeck = async (req, res, next) => {
         let [result] = await pool.query(deck, params)
         console.log(result);
         if(result.length == 0){
-            respuesta = {error: true, codigo: 200, mensaje: 'No se encontraron resultados'}
+            respuesta = {error: true, codigo: 200, mensaje: 'No se encontraron resultados', data:result}
         } else {
             respuesta = {error: false, codigo: 200, mensaje: 'Mazos recuperados', data: result}
         }
