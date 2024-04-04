@@ -113,7 +113,7 @@ const putMediaScore = async (req, res, next) => {
             if(existVoted.length > 0){
                 respuesta = {error:true, codigo: 200, mensaje: 'Ya has votado a este mazo hoy'};
             } else {
-                let params = [req.body.sumScore, req.body.id_deck]
+                let params = [req.body.score, req.body.id_deck]
                 let putMediaScore = `UPDATE deck 
                 SET sumScores = sumScores + ?,
                     nScores = nScores + 1
