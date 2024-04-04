@@ -7,6 +7,7 @@ router.get('/explora/votados', exploreCtrl.getVotedDecks);
 router.get('/explora', exploreCtrl.getSharedDecks);
 router.get('/explora/search', exploreCtrl.getDeck)
 router.put('/explora/mediaScore', exploreCtrl.putMediaScore)
+router.get('/explora/score', exploreCtrl.getScoreDeck)
 router.get('/explora/deck', exploreCtrl.getDeckById);
 
 

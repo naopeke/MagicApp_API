@@ -6,7 +6,7 @@ const getSharedDecks = async (req, res, next) => {
     let respuesta;
     try {
         let getShared = `SELECT user.nameUser, magydeck.deck.*,ROUND(COALESCE(sumScores/nScores, 0.0),1) AS mediaScore, 
-        JSON_ARRAYAGG(JSON_OBJECT('userVotes', votos.id_user, 'date', votos.date)) AS previousScore
+        JSON_ARRAYAGG(JSON_OBJECT('userVotes', votos.id_user, 'date', votos.date, 'score', votos.score)) AS previousScore
          FROM magydeck.deck
                 JOIN user ON (deck.id_user = user.id_user)
                 LEFT JOIN votos ON (deck.id_deck = votos.id_deck)
@@ -109,12 +109,11 @@ const putMediaScore = async (req, res, next) => {
             existVoted.forEach(voto => {
                 voto.date = format(new Date(voto.date), 'yyyy-MM-dd')
             })
-            console.log(existVoted);
     
             if(existVoted.length > 0){
                 respuesta = {error:true, codigo: 200, mensaje: 'Ya has votado a este mazo hoy'};
             } else {
-                let params = [req.body.score, req.body.id_deck]
+                let params = [req.body.sumScore, req.body.id_deck]
                 let putMediaScore = `UPDATE deck 
                 SET sumScores = sumScores + ?,
                     nScores = nScores + 1
@@ -130,13 +129,13 @@ const putMediaScore = async (req, res, next) => {
                     let [previousVote] = await pool.query(existVotePrevious, [req.body.id_user, req.body.id_deck])
                     
                     if(previousVote.length > 0){
-                        let updateVote = `UPDATE votos SET date = ? WHERE id_user = ? AND id_deck = ?`
-                        let [updateDate] = await pool.query(updateVote, [currentDay, req.body.id_user, req.body.id_deck])
-                        console.log(updateDate);
+                        let updateVote = `UPDATE votos SET date = ?, score = ? WHERE id_user = ? AND id_deck = ?`
+                        let [updateDate] = await pool.query(updateVote, [currentDay, req.body.score, req.body.id_user, req.body.id_deck])
+                        
+                     
                     } else {
-                        let insertVote = `INSERT INTO votos (id_user, id_deck, date) VALUES (?, ?, ?)`
-                        let [insert] = await pool.query(insertVote, [req.body.id_user, req.body.id_deck, currentDay])
-                        console.log(insert);
+                        let insertVote = `INSERT INTO votos (id_user, id_deck, date, score) VALUES (?, ?, ?, ?)`
+                        let [insert] = await pool.query(insertVote, [req.body.id_user, req.body.id_deck, currentDay, req.body.score])
                     }
     
                     respuesta = {error:false, codigo: 200, mensaje: 'Media modificada correctamente', data: result};
@@ -144,6 +143,22 @@ const putMediaScore = async (req, res, next) => {
             }
         }
 
+        res.json(respuesta)
+    } catch(error) {
+        console.error(`Error: ${error}`);
+    }
+}
+
+const getScoreDeck = async (req,res, next) =>{
+    try
+    {
+        let respuesta;
+      
+        let currentDay = format(new Date(), 'yyyy-MM-dd')
+        let query = `SELECT * FROM magydeck.votos WHERE id_user = ? AND id_deck = ? AND date = ?`
+        let [result] = await pool.query(query,[req.query.id_user, req.query.id_deck, currentDay])
+        console.log(result);
+        respuesta = {error: false, codigo: 200, mensaje: 'puntuaciones recuperadas', data: result}
         res.json(respuesta)
     } catch(error) {
         console.error(`Error: ${error}`);
@@ -269,6 +284,7 @@ module.exports = {
     getVotedDecks,
     getDeck,
     putMediaScore,
+    getScoreDeck,
     getDeckById
 };
 
