@@ -9,6 +9,7 @@ router.post('/eventos', eventCtrl.addMyEvent);
 router.put('/eventos', eventCtrl.editMyEvent);
 router.put('/eventos/detalle', eventCtrl.editParticipation);
 router.delete('/eventos', eventCtrl.deleteMyEvent);//belu
+router.get('/participacion', eventCtrl.getParticipation)
 
 
 // *NOTE - EVENTOS

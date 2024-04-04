@@ -12,7 +12,7 @@ const getAllEvents = async (req, res, next) => {
     let sql_AllEvents = "SELECT e.*, u_creador.*"+ 
     "FROM evento e " + 
     "JOIN userEvent eu ON e.id_event = eu.id_event "+
-    "JOIN user u_creador ON eu.id_user = u_creador.id_user WHERE e.date >=CURDATE() AND creator = 1";
+    "JOIN user u_creador ON eu.id_user = u_creador.id_user WHERE e.date >=CURDATE() AND creator = 1 ORDER BY e.date ASC" ;
 
     let respuesta;
     let eventos=[];
@@ -30,6 +30,7 @@ const getAllEvents = async (req, res, next) => {
             let event = {"id":result[i].id_event,"title":result[i].nameEvent,"date":result[i].date, "hour":result[i].hour, "place":result[i].place,"descriptionEvent":result[i].descriptionEvent, "direction":result[i].direction, "creator":{"id_user":result[i].id_user, "nameUser":result[i].nameUser , "avatar":result[i].avatar}};
             eventos.push(event);
         }
+       
         respuesta = new Response(false, 200, null, eventos);
         res.send(respuesta);
     } catch(err) {
@@ -44,7 +45,7 @@ const getMyEvents = async (req, res, next) => {
     let sql_AllEvents = "SELECT e.*, u_creador.*"+ 
     "FROM evento e " + 
     "JOIN userEvent eu ON e.id_event = eu.id_event "+
-    "JOIN user u_creador ON eu.id_user = u_creador.id_user WHERE eu.id_user = ? AND eu.creator = 1 AND e.date >= CURDATE()";
+    "JOIN user u_creador ON eu.id_user = u_creador.id_user WHERE eu.id_user = ? AND eu.creator = 1 AND e.date >= CURDATE() ORDER BY e.date ASC";
 
     let respuesta;
     let eventos=[];
@@ -169,11 +170,31 @@ const deleteMyEvent = async (req, res, next) => {
     }
 }
 
+const getParticipation = async (req,res, next) => {
+    let respuesta; 
+    try{
+        let partipaciones = `SELECT * FROM magydeck.userEvent WHERE id_event = ? AND id_user = ? AND creator = 0`
+        let [result] = await pool.query(partipaciones, [req.query.id_event, req.query.id_user])
+        console.log(result);
+        if(result.length < 0){
+            respuesta = {error: false, codigo: 200, mensaje: 'No participas en el evento', data: result}
+        } else {
+            respuesta = {error: false, codigo: 200, mensaje: 'Participacion recuperada', data: result}
+        }
+       
+        res.json(respuesta)
+    } catch(err) {
+        console.log(err);
+    }
+    
+}
+
 module.exports = {
     getAllEvents, //todo Ok
     getMyEvents, //todo Ok
     addMyEvent, //todo Ok
     editMyEvent, //todo Ok
     editParticipation, //todo Ok
-    deleteMyEvent //todo Ok
+    deleteMyEvent, //todo Ok
+    getParticipation
 };
