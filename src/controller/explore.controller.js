@@ -155,11 +155,17 @@ const getScoreDeck = async (req,res, next) =>{
         let respuesta;
       
         let currentDay = format(new Date(), 'yyyy-MM-dd')
-        let query = `SELECT * FROM magydeck.votos WHERE id_user = ? AND id_deck = ? AND date = ?`
+        let query = `SELECT date, id_user, score FROM magydeck.votos WHERE id_user = ? AND id_deck = ? AND date = ?`
         let [result] = await pool.query(query,[req.query.id_user, req.query.id_deck, currentDay])
-        console.log(result);
-        respuesta = {error: false, codigo: 200, mensaje: 'puntuaciones recuperadas', data: result}
-        res.json(respuesta)
+        if (result.length === 0) {
+            respuesta = { error: false, codigo: 200, mensaje: 'No se encontraron puntuaciones para este usuario y mazo.', data: [] };
+        } else {
+            result.forEach(voto => {
+                voto.date = format(new Date(voto.date), 'yyyy-MM-dd')
+            });
+            respuesta = { error: false, codigo: 200, mensaje: 'Puntuaciones recuperadas', data: result };
+        }
+        res.json(respuesta);
     } catch(error) {
         console.error(`Error: ${error}`);
     }
